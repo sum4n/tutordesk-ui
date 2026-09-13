@@ -1,0 +1,242 @@
+{
+  "students": [
+    {
+      "id": "1",
+      "name": "Aarav Reddy",
+      "email": "aarav@email.com",
+      "initials": "AR",
+      "color": "bg-amber-500",
+      "class": "Class 8-A",
+      "assignments": 4,
+      "pending": 2,
+      "grade": "B+"
+    },
+    {
+      "id": "2",
+      "name": "Priya Sharma",
+      "email": "priya@email.com",
+      "initials": "PS",
+      "color": "bg-emerald-500",
+      "class": "Class 9-B",
+      "assignments": 5,
+      "pending": 0,
+      "grade": "A"
+    },
+    {
+      "id": "3",
+      "name": "Rohan Kumar",
+      "email": "rohan@email.com",
+      "initials": "RK",
+      "color": "bg-blue-500",
+      "class": "Class 10-C",
+      "assignments": 3,
+      "pending": 1,
+      "grade": "B"
+    },
+    {
+      "id": "4",
+      "name": "Anaya Mehta",
+      "email": "anaya@email.com",
+      "initials": "AM",
+      "color": "bg-pink-500",
+      "class": "Class 8-A",
+      "assignments": 4,
+      "pending": 0,
+      "grade": "A+"
+    },
+    {
+      "id": "5",
+      "name": "Vihaan Singh",
+      "email": "vihaan@email.com",
+      "initials": "VS",
+      "color": "bg-violet-500",
+      "class": "Class 10-C",
+      "assignments": 3,
+      "pending": 1,
+      "grade": "B-"
+    },
+    {
+      "id": "6",
+      "name": "Ishaan Patel",
+      "email": "ishaan@email.com",
+      "initials": "IP",
+      "color": "bg-cyan-500",
+      "class": "Class 9-B",
+      "assignments": 5,
+      "pending": 2,
+      "grade": "B+"
+    }
+  ],
+  "classes": [
+    {
+      "id": "1",
+      "code": "8A",
+      "name": "Class 8-A",
+      "subject": "Mathematics & Science",
+      "students": 10,
+      "assignments": 4,
+      "tone": "bg-indigo-100 text-indigo-700"
+    },
+    {
+      "id": "2",
+      "code": "9B",
+      "name": "Class 9-B",
+      "subject": "Science & English",
+      "students": 6,
+      "assignments": 5,
+      "tone": "bg-emerald-100 text-emerald-700"
+    },
+    {
+      "id": "3",
+      "code": "10C",
+      "name": "Class 10-C",
+      "subject": "Math & History",
+      "students": 8,
+      "assignments": 3,
+      "tone": "bg-rose-100 text-rose-700"
+    }
+  ],
+  "assignments": [
+    {
+      "id": "1",
+      "title": "Algebra Basics",
+      "file": "math-hw-1.pdf",
+      "class": "Class 8-A",
+      "due": "Sep 10, 2026",
+      "submitted": 7,
+      "total": 10,
+      "status": "Active"
+    },
+    {
+      "id": "2",
+      "title": "Photosynthesis Notes",
+      "file": "bio-notes-2.pdf",
+      "class": "Class 9-B",
+      "due": "Sep 08, 2026",
+      "submitted": 6,
+      "total": 6,
+      "status": "Grading"
+    },
+    {
+      "id": "3",
+      "title": "World War II Essay",
+      "file": "history-essay-1.pdf",
+      "class": "Class 10-C",
+      "due": "Sep 14, 2026",
+      "submitted": 3,
+      "total": 8,
+      "status": "Active"
+    },
+    {
+      "id": "4",
+      "title": "Trigonometry HW",
+      "file": "math-trig-3.pdf",
+      "class": "Class 10-C",
+      "due": "Sep 05, 2026",
+      "submitted": 8,
+      "total": 8,
+      "status": "Completed"
+    },
+    {
+      "id": "5",
+      "title": "Geometry Quiz",
+      "file": "math-geo-4.pdf",
+      "class": "Class 9-B",
+      "due": "Sep 12, 2026",
+      "submitted": 0,
+      "total": 6,
+      "status": "Active"
+    },
+    {
+      "id": "6",
+      "title": "Fractions Practice",
+      "file": "math-frac-5.pdf",
+      "class": "Class 8-A",
+      "due": "Sep 18, 2026",
+      "submitted": 0,
+      "total": 10,
+      "status": "Active"
+    }
+  ],
+  "submissions": [
+    {
+      "id": "1",
+      "name": "Aarav R.",
+      "initials": "AR",
+      "color": "bg-amber-500",
+      "assignment": "Algebra Basics",
+      "class": "Class 8-A",
+      "status": "Pending"
+    },
+    {
+      "id": "2",
+      "name": "Priya S.",
+      "initials": "PS",
+      "color": "bg-emerald-500",
+      "assignment": "Photosynthesis Notes",
+      "class": "Class 9-B",
+      "status": "Graded · A"
+    },
+    {
+      "id": "3",
+      "name": "Rohan K.",
+      "initials": "RK",
+      "color": "bg-blue-500",
+      "assignment": "World War II Essay",
+      "class": "Class 10-C",
+      "status": "Pending"
+    },
+    {
+      "id": "4",
+      "name": "Anaya M.",
+      "initials": "AM",
+      "color": "bg-pink-500",
+      "assignment": "Algebra Basics",
+      "class": "Class 8-A",
+      "status": "Graded · A+"
+    },
+    {
+      "id": "5",
+      "name": "Vihaan S.",
+      "initials": "VS",
+      "color": "bg-violet-500",
+      "assignment": "Trigonometry HW",
+      "class": "Class 10-C",
+      "status": "Pending"
+    }
+  ],
+  "deadlines": [
+    {
+      "id": "1",
+      "month": "SEP",
+      "day": "12",
+      "title": "Geometry Quiz",
+      "meta": "Class 9-B · 18 students",
+      "tone": "bg-red-50 text-red-600"
+    },
+    {
+      "id": "2",
+      "month": "SEP",
+      "day": "15",
+      "title": "Organic Chemistry",
+      "meta": "Class 10-C · 8 students",
+      "tone": "bg-blue-50 text-blue-600"
+    },
+    {
+      "id": "3",
+      "month": "SEP",
+      "day": "18",
+      "title": "Fractions Practice",
+      "meta": "Class 8-A · 10 students",
+      "tone": "bg-amber-50 text-amber-600"
+    },
+    {
+      "id": "4",
+      "month": "SEP",
+      "day": "22",
+      "title": "Essay: Climate",
+      "meta": "Class 10-C · 8 students",
+      "tone": "bg-emerald-50 text-emerald-600"
+    }
+  ]
+}
