@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { Sidebar } from "@/components/layout/Sidebar"
 import { TopBar } from "@/components/layout/TopBar"
+import { DashboardPage } from "@/pages/DashboardPage"
 import { pageMeta } from "@/config/appConfig"
 import type { PageKey } from "@/types"
 
@@ -14,7 +15,9 @@ export default function App() {
       <div className="flex min-w-0 flex-1 flex-col">
         <TopBar title={meta.title} subtitle={meta.subtitle} />
 
-        <main className="flex-1 overflow-auto"></main>
+        <main className="flex-1 overflow-auto">
+          {page === "dashboard" && <DashboardPage />}
+        </main>
       </div>
     </div>
   )
