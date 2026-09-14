@@ -119,7 +119,7 @@ export function DashboardPage() {
             {upcomingDeadlines.map((d) => (
               <div key={d.id} className="flex items-start gap-3">
                 <div
-                  className={`h-10 w-10 rounded-lg ${d.tone} flex flex-shrink-0 items-center justify-center text-xs font-semibold`}
+                  className={`h-10 w-10 rounded-lg ${d.tone} flex shrink-0 items-center justify-center text-xs font-semibold`}
                 >
                   <div className="text-center leading-tight">
                     <div>{d.month}</div>
