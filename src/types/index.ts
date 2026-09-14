@@ -37,6 +37,7 @@ export interface Deadline {
 }
 
 export interface ClassItem {
+  id: string
   code: string
   name: string
   subject: string
