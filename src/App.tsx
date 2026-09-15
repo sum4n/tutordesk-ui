@@ -3,6 +3,7 @@ import { Sidebar } from "@/components/layout/Sidebar"
 import { TopBar } from "@/components/layout/TopBar"
 import { DashboardPage } from "@/pages/DashboardPage"
 import { ClassesPage } from "@/pages/ClassesPage"
+import { StudentsPage } from "@/pages/StudentsPage"
 import { pageMeta } from "@/config/appConfig"
 import type { PageKey } from "@/types"
 
@@ -19,6 +20,7 @@ export default function App() {
         <main className="flex-1 overflow-auto">
           {page === "dashboard" && <DashboardPage />}
           {page === "classes" && <ClassesPage />}
+          {page === "students" && <StudentsPage />}
         </main>
       </div>
     </div>
