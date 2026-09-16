@@ -20,11 +20,17 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Plus } from "lucide-react"
 import { useStudents } from "@/hooks/useStudents"
+import { useClasses } from "@/hooks/useClasses"
 
 export function StudentsPage() {
-  const { students, loading, error } = useStudents()
+  const {
+    students,
+    loading: studentsLoading,
+    error: studentsError,
+  } = useStudents()
+  const { classes, loading: classesLoading, error: classesError } = useClasses()
 
-  if (loading) {
+  if (studentsLoading || classesLoading) {
     return (
       <div className="flex h-full items-center justify-center">
         <p className="text-muted-foreground">Loading...</p>
@@ -32,10 +38,10 @@ export function StudentsPage() {
     )
   }
 
-  if (error) {
+  if (studentsError || classesError) {
     return (
       <div className="flex h-full items-center justify-center">
-        <p className="text-red-500">Error: {error}</p>
+        <p className="text-red-500">Error: {studentsError || classesError}</p>
       </div>
     )
   }
@@ -65,9 +71,11 @@ export function StudentsPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Classes</SelectItem>
-                <SelectItem value="8a">Class 8-A</SelectItem>
-                <SelectItem value="9b">Class 9-B</SelectItem>
-                <SelectItem value="10c">Class 10-C</SelectItem>
+                {classes.map((c) => (
+                  <SelectItem key={c.id} value={c.name}>
+                    {c.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
