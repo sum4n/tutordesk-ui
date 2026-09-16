@@ -21,6 +21,9 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Plus } from "lucide-react"
 import { useStudents } from "@/hooks/useStudents"
 import { useClasses } from "@/hooks/useClasses"
+import { useState } from "react"
+
+const ALL_CLASSES = "All Classes"
 
 export function StudentsPage() {
   const {
@@ -29,6 +32,13 @@ export function StudentsPage() {
     error: studentsError,
   } = useStudents()
   const { classes, loading: classesLoading, error: classesError } = useClasses()
+
+  const [selectedClass, setSelectedClass] = useState<string>(ALL_CLASSES)
+
+  const filteredStudents =
+    selectedClass === ALL_CLASSES
+      ? students
+      : students.filter((student) => student.class === selectedClass)
 
   if (studentsLoading || classesLoading) {
     return (
@@ -65,12 +75,17 @@ export function StudentsPage() {
         <CardHeader>
           <div className="flex items-center gap-2">
             <Input placeholder="Search students..." className="flex-1" />
-            <Select defaultValue="all">
+            <Select
+              defaultValue={ALL_CLASSES}
+              onValueChange={(value) => {
+                if (value) setSelectedClass(value)
+              }}
+            >
               <SelectTrigger className="w-40">
                 <SelectValue placeholder="Filter by class" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Classes</SelectItem>
+                <SelectItem value={ALL_CLASSES}>{ALL_CLASSES}</SelectItem>
                 {classes.map((c) => (
                   <SelectItem key={c.id} value={c.name}>
                     {c.name}
@@ -93,7 +108,7 @@ export function StudentsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {students.map((s) => (
+              {filteredStudents.map((s) => (
                 <TableRow key={s.id}>
                   <TableCell>
                     <div className="flex items-center gap-2">
