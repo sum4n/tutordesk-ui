@@ -22,6 +22,7 @@ import { Plus } from "lucide-react"
 import { useStudents } from "@/hooks/useStudents"
 import { useClasses } from "@/hooks/useClasses"
 import { useState } from "react"
+import { useFilteredStudents } from "@/hooks/useFilteredStudents"
 
 const ALL_CLASSES = "All Classes"
 
@@ -34,11 +35,13 @@ export function StudentsPage() {
   const { classes, loading: classesLoading, error: classesError } = useClasses()
 
   const [selectedClass, setSelectedClass] = useState<string>(ALL_CLASSES)
+  const [searchQuery, setSearchQuery] = useState<string>("")
 
-  const filteredStudents =
-    selectedClass === ALL_CLASSES
-      ? students
-      : students.filter((student) => student.class === selectedClass)
+  const { searchedStudents } = useFilteredStudents({
+    students,
+    selectedClass,
+    searchQuery,
+  })
 
   if (studentsLoading || classesLoading) {
     return (
@@ -74,7 +77,13 @@ export function StudentsPage() {
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
-            <Input placeholder="Search students..." className="flex-1" />
+            <Input
+              placeholder="Search students..."
+              className="flex-1"
+              onChange={(e) => {
+                setSearchQuery(e.target.value)
+              }}
+            />
             <Select
               defaultValue={ALL_CLASSES}
               onValueChange={(value) => {
@@ -108,7 +117,7 @@ export function StudentsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredStudents.map((s) => (
+              {searchedStudents.map((s) => (
                 <TableRow key={s.id}>
                   <TableCell>
                     <div className="flex items-center gap-2">
