@@ -17,54 +17,59 @@ export interface Stat {
   sub: string
 }
 
-export interface Submission {
+export interface Class {
   id: string
   name: string
-  initials: string
-  color: string
-  assignment: string
-  class: string
-  status: string
+  description: string
 }
 
-export interface Deadline {
+export interface Batch {
   id: string
-  month: string
-  day: string
-  title: string
-  meta: string
-  tone: string
-}
-
-export interface ClassItem {
-  id: string
-  code: string
+  classId: string
   name: string
-  subject: string
-  students: number
-  assignments: number
-  tone: string
+  schedule: string
+}
+
+export interface Subject {
+  id: string
+  name: string
+}
+
+export interface ClassSubject {
+  id: string
+  classId: string
+  subjectId: string
 }
 
 export interface Student {
   id: string
   name: string
   email: string
-  initials: string
-  color: string
-  class: string
-  assignments: number
-  pending: number
-  grade: string
+  classId: string
+  batchId: string | null
 }
 
 export interface Assignment {
   id: string
   title: string
-  file: string
-  class: string
-  due: string
-  submitted: number
-  total: number
-  status: string
+  description: string
+  pdfUrl: string
+  classId: string
+  batchId: string
+  subjectId: string
+  dueDate: string
+  createdAt: string
+}
+
+export interface Submission {
+  id: string
+  assignments: string
+  studentId: string
+  status: "pending" | "submitted" | "graded"
+  studentPdfUrl: string | null
+  submittedAt: string | null
+  teacherPdfUrl: string | null
+  gradedAt: string | null
+  grade: string | null
+  feedback: string | null
 }
