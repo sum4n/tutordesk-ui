@@ -17,14 +17,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Plus } from "lucide-react"
 import { useStudents } from "@/hooks/useStudents"
 import { useClasses } from "@/hooks/useClasses"
 import { useState } from "react"
-import { useFilteredStudents } from "@/hooks/useFilteredStudents"
-
-const ALL_CLASSES = "All Classes"
+import { useFilteredStudents, ALL_CLASSES } from "@/hooks/useFilteredStudents"
 
 export function StudentsPage() {
   const {
@@ -96,8 +93,8 @@ export function StudentsPage() {
               <SelectContent>
                 <SelectItem value={ALL_CLASSES}>{ALL_CLASSES}</SelectItem>
                 {classes.map((c) => (
-                  <SelectItem key={c.id} value={c.name}>
-                    {c.name}
+                  <SelectItem key={c.class.id} value={c.class.id}>
+                    {c.class.name}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -112,40 +109,37 @@ export function StudentsPage() {
                 <TableHead>Class</TableHead>
                 <TableHead>Assignments</TableHead>
                 <TableHead>Pending</TableHead>
-                <TableHead>Avg Grade</TableHead>
                 <TableHead className="text-right">Action</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {searchedStudents.map((s) => (
-                <TableRow key={s.id}>
+                <TableRow key={s.student.id}>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <Avatar className="h-7 w-7">
-                        <AvatarFallback
-                          className={`${s.color} text-xs text-white`}
-                        >
-                          {s.initials}
-                        </AvatarFallback>
-                      </Avatar>
                       <div>
-                        <div className="font-medium">{s.name}</div>
+                        <div className="font-medium">{s.student.name}</div>
                         <div className="text-xs text-muted-foreground">
-                          {s.email}
+                          {s.student.email}
                         </div>
                       </div>
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="secondary">{s.class}</Badge>
-                  </TableCell>
-                  <TableCell>{s.assignments}</TableCell>
-                  <TableCell>
-                    <Badge variant={s.pending === 0 ? "default" : "outline"}>
-                      {s.pending}
+                    <Badge variant="secondary">
+                      {s.batchName
+                        ? `${s.className} - ${s.batchName}`
+                        : s.className}
                     </Badge>
                   </TableCell>
-                  <TableCell className="font-semibold">{s.grade}</TableCell>
+                  <TableCell>{s.assignmentCount}</TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={s.pendingCount === 0 ? "default" : "outline"}
+                    >
+                      {s.pendingCount}
+                    </Badge>
+                  </TableCell>
                   <TableCell className="text-right">
                     <Button variant="ghost" size="sm">
                       View
