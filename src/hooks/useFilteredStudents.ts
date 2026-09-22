@@ -8,6 +8,7 @@ interface StudentDetails {
   className: string
   batchName: string | null
   assignmentCount: number
+  assignmentsDone: number
   pendingCount: number
 }
 

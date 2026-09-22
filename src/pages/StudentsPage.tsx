@@ -132,7 +132,7 @@ export function StudentsPage() {
                         : s.className}
                     </Badge>
                   </TableCell>
-                  <TableCell>{s.assignmentCount}</TableCell>
+                  <TableCell>{`${s.assignmentsDone} / ${s.assignmentCount}`}</TableCell>
                   <TableCell>
                     <Badge
                       variant={s.pendingCount === 0 ? "default" : "outline"}
