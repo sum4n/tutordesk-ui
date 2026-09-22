@@ -6,6 +6,7 @@ interface StudentDetails {
   className: string
   batchName: string | null
   assignmentCount: number
+  assignmentsDone: number
   pendingCount: number
 }
 
@@ -64,8 +65,12 @@ export function useStudents(): StudentData {
           const batchName = studentBatch?.name || null
 
           // Count assignments
-          const assignmentCount = assignments.filter(
-            (a) => a.classId === s.classId
+          const assignmentCount = assignments.filter((a) =>
+            a.batchId ? a.batchId === s.batchId : a.classId === s.classId
+          ).length
+
+          const assignmentsDone = submissions.filter(
+            (sub) => sub.studentId === s.id
           ).length
 
           // Count pending submissions
@@ -78,6 +83,7 @@ export function useStudents(): StudentData {
             className,
             batchName,
             assignmentCount,
+            assignmentsDone,
             pendingCount,
           }
         })
