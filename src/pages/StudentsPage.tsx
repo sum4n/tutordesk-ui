@@ -108,7 +108,7 @@ export function StudentsPage() {
                 <TableHead>Student</TableHead>
                 <TableHead>Class</TableHead>
                 <TableHead>Assignments</TableHead>
-                <TableHead>Pending</TableHead>
+                <TableHead>Pending Reviews</TableHead>
                 <TableHead className="text-right">Action</TableHead>
               </TableRow>
             </TableHeader>
