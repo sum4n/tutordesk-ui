@@ -1,10 +1,18 @@
 import { useMemo } from "react"
 import type { Student } from "@/types"
 
-const ALL_CLASSES = "All Classes"
+export const ALL_CLASSES = "All Classes"
+
+interface StudentDetails {
+  student: Student
+  className: string
+  batchName: string | null
+  assignmentCount: number
+  pendingCount: number
+}
 
 interface UseFilteredStudentsProps {
-  students: Student[]
+  students: StudentDetails[]
   selectedClass: string
   searchQuery: string
 }
@@ -18,7 +26,7 @@ export function useFilteredStudents({
     if (selectedClass === ALL_CLASSES) {
       return students
     }
-    return students.filter((student) => student.class === selectedClass)
+    return students.filter((s) => s.student.classId === selectedClass)
   }, [students, selectedClass])
 
   const searchedStudents = useMemo(() => {
@@ -26,10 +34,10 @@ export function useFilteredStudents({
       return filteredStudents
     }
     const query = searchQuery.toLowerCase()
-    return filteredStudents.filter((student) => {
+    return filteredStudents.filter((s) => {
       return (
-        student.name.toLowerCase().includes(query) ||
-        student.email.toLowerCase().includes(query)
+        s.student.name.toLowerCase().includes(query) ||
+        s.student.email.toLowerCase().includes(query)
       )
     })
   }, [filteredStudents, searchQuery])
