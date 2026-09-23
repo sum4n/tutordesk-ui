@@ -1,71 +1,82 @@
 import { useEffect, useState } from "react"
-import type {
-  Student,
-  ClassItem,
-  Assignment,
-  Submission,
-  Deadline,
-  Stat,
-} from "@/types"
+import type { Student, Class, Assignment, Submission, Stat } from "@/types"
+
+interface EnrichedSubmission {
+  id: string
+  studentName: string
+  assignmentTitle: string
+  className: string
+  status: "pending" | "submitted" | "graded"
+  submittedAt: string | null
+}
+
+interface UpcomingDeadline {
+  id: string
+  title: string
+  className: string
+  dueDate: string
+  month: string
+  day: string
+}
 
 interface DashboardData {
   stats: Stat[]
-  recentSubmissions: Submission[]
-  upcomingDeadlines: Deadline[]
+  recentSubmissions: EnrichedSubmission[]
+  upcomingDeadlines: UpcomingDeadline[]
   loading: boolean
   error: string | null
 }
 
 export function useDashboard(): DashboardData {
   const [stats, setStats] = useState<Stat[]>([])
-  const [recentSubmissions, setRecentSubmissions] = useState<Submission[]>([])
-  const [upcomingDeadlines, setUpcomingDeadlines] = useState<Deadline[]>([])
+  const [recentSubmissions, setRecentSubmissions] = useState<
+    EnrichedSubmission[]
+  >([])
+  const [upcomingDeadlines, setUpcomingDeadlines] = useState<
+    UpcomingDeadline[]
+  >([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     async function fetchDashboardData() {
       try {
-        // Fetch all data in parallel
-        const [
-          studentsRes,
-          classesRes,
-          assignmentsRes,
-          submissionsRes,
-          deadlinesRes,
-        ] = await Promise.all([
-          fetch("http://localhost:3001/students"),
-          fetch("http://localhost:3001/classes"),
-          fetch("http://localhost:3001/assignments"),
-          fetch("http://localhost:3001/submissions"),
-          fetch("http://localhost:3001/deadlines"),
-        ])
+        const apiUrl = import.meta.env.VITE_API_BASE_URL
 
-        // Check if all requests succeeded
+        const [studentsRes, classesRes, assignmentsRes, submissionsRes] =
+          await Promise.all([
+            fetch(`${apiUrl}/students`),
+            fetch(`${apiUrl}/classes`),
+            fetch(`${apiUrl}/assignments`),
+            fetch(`${apiUrl}/submissions`),
+          ])
+
         if (
           !studentsRes.ok ||
           !classesRes.ok ||
           !assignmentsRes.ok ||
-          !submissionsRes.ok ||
-          !deadlinesRes.ok
+          !submissionsRes.ok
         ) {
           throw new Error("Failed to fetch dashboard data")
         }
 
-        // Parse all responses
         const students: Student[] = await studentsRes.json()
-        const classes: ClassItem[] = await classesRes.json()
+        const classes: Class[] = await classesRes.json()
         const assignments: Assignment[] = await assignmentsRes.json()
         const submissions: Submission[] = await submissionsRes.json()
-        const deadlines: Deadline[] = await deadlinesRes.json()
 
-        // Calculate stats
+        // 1. Calculate Stats
         const pendingReviews = submissions.filter(
-          (s) => s.status === "Pending"
+          (s) => s.status !== "graded"
         ).length
-        const activeAssignments = assignments.filter(
-          (a) => a.status === "Active"
-        ).length
+
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+        const activeAssignments = assignments.filter((a) => {
+          const dueDate = new Date(a.dueDate)
+          dueDate.setHours(0, 0, 0, 0)
+          return dueDate >= today
+        }).length
 
         const calculatedStats: Stat[] = [
           {
@@ -81,18 +92,72 @@ export function useDashboard(): DashboardData {
           {
             label: "Pending Reviews",
             value: pendingReviews.toString(),
-            sub: "Sumissions to grade",
+            sub: "Submissions to grade",
           },
           {
-            label: "Assignments",
+            label: "Total Assignments",
             value: assignments.length.toString(),
-            sub: `${activeAssignments} active this week`,
+            sub: `${activeAssignments} currently active`,
           },
         ]
 
-        // Update state
+        // 2. Enrich Recent Submissions (Get the last 5)
+        const enrichedRecent = submissions
+          .sort((a, b) => {
+            const dateA = a.submittedAt ? new Date(a.submittedAt).getTime() : 0
+            const dateB = b.submittedAt ? new Date(b.submittedAt).getTime() : 0
+            return dateB - dateA
+          })
+          .slice(0, 5)
+          .map((sub) => {
+            const student = students.find((s) => s.id === sub.studentId)
+            const assignment = assignments.find(
+              (a) => a.id === sub.assignmentId
+            )
+            const studentClass = classes.find((c) => c.id === student?.classId)
+
+            return {
+              id: sub.id,
+              studentName: student?.name || "Unknown Student",
+              assignmentTitle: assignment?.title || "Unknown Assignment",
+              className: studentClass?.name || "Unknown Class",
+              status: sub.status,
+              submittedAt: sub.submittedAt,
+            }
+          })
+
+        // 3. Calculate Upcoming Deadlines (Next 4 active assignments)
+        const deadlines = assignments
+          .filter((a) => {
+            const dueDate = new Date(a.dueDate)
+            dueDate.setHours(0, 0, 0, 0)
+            return dueDate >= today // Only future or today
+          })
+          .sort(
+            (a, b) =>
+              new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
+          ) // Sort by closest date
+          .slice(0, 4) // Take top 4
+          .map((a) => {
+            const studentClass = classes.find((c) => c.id === a.classId)
+            const date = new Date(a.dueDate)
+
+            // Format month (e.g., "Sep") and day (e.g., "25")
+            const month = date.toLocaleString("default", { month: "short" })
+            const day = date.getDate().toString()
+
+            return {
+              id: a.id,
+              title: a.title,
+              className: studentClass?.name || "Unknown Class",
+              dueDate: a.dueDate,
+              month,
+              day,
+            }
+          })
+
         setStats(calculatedStats)
-        setRecentSubmissions(submissions)
+        setRecentSubmissions(enrichedRecent)
         setUpcomingDeadlines(deadlines)
         setLoading(false)
       } catch (err) {
@@ -100,6 +165,7 @@ export function useDashboard(): DashboardData {
         setLoading(false)
       }
     }
+
     fetchDashboardData()
   }, [])
 
