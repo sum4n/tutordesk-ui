@@ -27,7 +27,7 @@ export function useFilteredStudents({
     if (selectedClass === ALL_CLASSES) {
       return students
     }
-    return students.filter((s) => s.student.classId === selectedClass)
+    return students.filter((s) => s.className === selectedClass)
   }, [students, selectedClass])
 
   const searchedStudents = useMemo(() => {

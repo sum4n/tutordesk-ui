@@ -93,7 +93,7 @@ export function StudentsPage() {
               <SelectContent>
                 <SelectItem value={ALL_CLASSES}>{ALL_CLASSES}</SelectItem>
                 {classes.map((c) => (
-                  <SelectItem key={c.class.id} value={c.class.id}>
+                  <SelectItem key={c.class.id} value={c.class.name}>
                     {c.class.name}
                   </SelectItem>
                 ))}
