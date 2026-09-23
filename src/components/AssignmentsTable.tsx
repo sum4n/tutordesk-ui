@@ -10,12 +10,12 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { FileText } from "lucide-react"
-import type { Assignment } from "@/types"
+import type { EnrichedAssignment } from "@/hooks/useAssignments"
 
 export function AssignmentsTable({
   assignments,
 }: {
-  assignments: Assignment[]
+  assignments: EnrichedAssignment[]
 }) {
   return (
     <Card>
@@ -33,25 +33,34 @@ export function AssignmentsTable({
           </TableHeader>
           <TableBody>
             {assignments.map((a) => (
-              <TableRow key={a.id}>
+              <TableRow key={a.assignment.id}>
                 <TableCell>
                   <div className="flex items-center gap-2">
                     <FileText className="h-4 w-4 text-red-500" />
                     <div>
-                      <div className="font-medium">{a.title}</div>
+                      <div className="font-medium">{a.assignment.title}</div>
                       <div className="text-xs text-muted-foreground">
-                        {a.file}
+                        {a.assignment.pdfUrl}
                       </div>
                     </div>
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Badge variant="secondary">{a.class}</Badge>
+                  <Badge variant="secondary">
+                    {a.batchName
+                      ? `${a.className} - ${a.batchName}`
+                      : a.className}
+                  </Badge>
                 </TableCell>
-                <TableCell>{a.due}</TableCell>
+                <TableCell>{a.assignment.dueDate}</TableCell>
                 <TableCell>
-                  <span className="font-semibold">{a.submitted}</span>
-                  <span className="text-muted-foreground"> / {a.total}</span>
+                  <span className="font-semibold">
+                    {a.numberOfAssignmentsSubmitted}
+                  </span>
+                  <span className="text-muted-foreground">
+                    {" "}
+                    / {a.numberOfStudentsWithAssignments}
+                  </span>
                 </TableCell>
                 <TableCell>
                   <Badge
