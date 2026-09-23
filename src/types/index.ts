@@ -55,7 +55,7 @@ export interface Assignment {
   description: string
   pdfUrl: string
   classId: string
-  batchId: string
+  batchId: string | null
   subjectId: string
   dueDate: string
   createdAt: string
@@ -63,7 +63,7 @@ export interface Assignment {
 
 export interface Submission {
   id: string
-  assignments: string
+  assignmentId: string
   studentId: string
   status: "pending" | "submitted" | "graded"
   studentPdfUrl: string | null
