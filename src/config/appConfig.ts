@@ -1,11 +1,18 @@
 import type { NavItem, PageMeta, PageKey } from "@/types"
-import { LayoutDashboard, GraduationCap, Users, FileText } from "lucide-react"
+import {
+  LayoutDashboard,
+  GraduationCap,
+  Users,
+  FileText,
+  FilePen,
+} from "lucide-react"
 
 export const navItems: NavItem[] = [
   { key: "dashboard", label: "Dashboard", Icon: LayoutDashboard },
   { key: "classes", label: "Classes", Icon: GraduationCap },
   { key: "students", label: "Students", Icon: Users },
   { key: "assignments", label: "Assignments", Icon: FileText },
+  { key: "submissions", label: "Submissions", Icon: FilePen },
 ]
 
 export const pageMeta: Record<PageKey, PageMeta> = {
@@ -18,5 +25,9 @@ export const pageMeta: Record<PageKey, PageMeta> = {
   assignments: {
     title: "Assignments",
     subtitle: "Upload PDFs and track submissions",
+  },
+  submissions: {
+    title: "Submissions",
+    subtitle: "Check submissions",
   },
 }

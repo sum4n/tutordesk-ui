@@ -5,6 +5,7 @@ import { DashboardPage } from "@/pages/DashboardPage"
 import { ClassesPage } from "@/pages/ClassesPage"
 import { StudentsPage } from "@/pages/StudentsPage"
 import { AssignmentsPage } from "@/pages/AssignmentsPage"
+import { SubmissionsPage } from "@/pages/SubmissionsPage"
 import { pageMeta } from "@/config/appConfig"
 import type { PageKey } from "@/types"
 
@@ -23,6 +24,7 @@ export default function App() {
           {page === "classes" && <ClassesPage />}
           {page === "students" && <StudentsPage />}
           {page === "assignments" && <AssignmentsPage />}
+          {page === "submissions" && <SubmissionsPage />}
         </main>
       </div>
     </div>

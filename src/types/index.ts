@@ -1,4 +1,5 @@
-export type PageKey = "dashboard" | "classes" | "students" | "assignments"
+export type PageKey =
+  "dashboard" | "classes" | "students" | "assignments" | "submissions"
 
 export interface NavItem {
   key: PageKey
