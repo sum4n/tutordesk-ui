@@ -10,9 +10,10 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Plus, Users, FileText } from "lucide-react"
 import { useClasses } from "@/hooks/useClasses"
+import { CreateClassDialog } from "@/components/CreateClassDialog"
 
 export function ClassesPage() {
-  const { classes, loading, error } = useClasses()
+  const { classes, loading, error, refresh } = useClasses()
 
   if (loading) {
     return (
@@ -39,10 +40,7 @@ export function ClassesPage() {
             Manage your tuition classes and student batches
           </p>
         </div>
-        <Button size="sm" className="gap-1.5">
-          <Plus className="h-3.5 w-3.5" />
-          New Class
-        </Button>
+        <CreateClassDialog onClassCreated={refresh} />
       </div>
 
       {classes.length === 0 ? (
