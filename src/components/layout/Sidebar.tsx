@@ -1,8 +1,8 @@
+import { useLocation, useNavigate } from "react-router"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { navItems } from "@/config/appConfig"
-import type { PageKey } from "@/types"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,12 +21,12 @@ import {
   LayoutDashboard,
 } from "lucide-react"
 
-interface SidebarProps {
-  current: PageKey
-  onChange: (page: PageKey) => void
-}
+export function Sidebar() {
+  const location = useLocation()
+  const navigate = useNavigate()
 
-export function Sidebar({ current, onChange }: SidebarProps) {
+  const isActive = (path: string) => location.pathname === path
+
   return (
     <aside className="flex w-60 flex-col border-r bg-background">
       <div className="flex items-center gap-2 px-4 py-4">
@@ -49,9 +49,9 @@ export function Sidebar({ current, onChange }: SidebarProps) {
             </div>
             <nav className="space-y-1">
               <Button
-                variant={current === "dashboard" ? "secondary" : "ghost"}
+                variant={isActive("/dashboard") ? "secondary" : "ghost"}
                 className="w-full justify-start gap-2"
-                onClick={() => onChange("dashboard")}
+                onClick={() => navigate("/dashboard")}
               >
                 <LayoutDashboard className="h-4 w-4" />
                 Dashboard
@@ -68,9 +68,9 @@ export function Sidebar({ current, onChange }: SidebarProps) {
                 return (
                   <Button
                     key={item.key}
-                    variant={current === item.key ? "secondary" : "ghost"}
+                    variant={isActive(`/${item.key}`) ? "secondary" : "ghost"}
                     className="w-full justify-start gap-2"
-                    onClick={() => onChange(item.key)}
+                    onClick={() => navigate(`/${item.key}`)}
                   >
                     <item.Icon className="h-4 w-4" />
                     {item.label}
@@ -96,7 +96,7 @@ export function Sidebar({ current, onChange }: SidebarProps) {
                   <Avatar className="self-center">
                     <AvatarImage
                       src="https://github.com/shadcn.png"
-                      alt="shadcn"
+                      alt="User"
                     />
                     <AvatarFallback>LR</AvatarFallback>
                   </Avatar>
@@ -111,25 +111,24 @@ export function Sidebar({ current, onChange }: SidebarProps) {
               </Button>
             }
           />
-
           <DropdownMenuContent side="right" align="end">
             <DropdownMenuGroup>
               <DropdownMenuItem>
-                <BadgeCheckIcon />
+                <BadgeCheckIcon className="mr-2 h-4 w-4" />
                 Account
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <CreditCardIcon />
+                <CreditCardIcon className="mr-2 h-4 w-4" />
                 Billing
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <BellIcon />
+                <BellIcon className="mr-2 h-4 w-4" />
                 Notifications
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <LogOutIcon />
+              <LogOutIcon className="mr-2 h-4 w-4" />
               Sign Out
             </DropdownMenuItem>
           </DropdownMenuContent>
