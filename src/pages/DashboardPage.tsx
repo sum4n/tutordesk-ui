@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -18,6 +19,7 @@ import {
 import { useDashboard } from "@/hooks/useDashboard"
 
 export function DashboardPage() {
+  const navigate = useNavigate()
   const { stats, recentSubmissions, upcomingDeadlines, loading, error } =
     useDashboard()
 
@@ -61,7 +63,11 @@ export function DashboardPage() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle>Recent Submissions</CardTitle>
-              <Button variant="ghost" size="sm">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate("/submissions")}
+              >
                 View all →
               </Button>
             </div>
