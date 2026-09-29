@@ -1,11 +1,19 @@
-import { Button } from "@/components/ui/button"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import { Plus } from "lucide-react"
 import { useAssignments } from "@/hooks/useAssignments"
 import { AssignmentsTable } from "@/components/AssignmentsTable"
+import { CreateAssignmentDialog } from "@/components/CreateAssignmentDialog"
 
 export function AssignmentsPage() {
-  const { assignments, loading, error } = useAssignments()
+  const {
+    assignments,
+    loading,
+    error,
+    refresh,
+    classes,
+    batches,
+    subjects,
+    classSubjects,
+  } = useAssignments()
 
   if (loading) {
     return (
@@ -40,10 +48,13 @@ export function AssignmentsPage() {
             Upload PDFs and track student submissions
           </p>
         </div>
-        <Button size="sm" className="gap-1.5">
-          <Plus className="h-3.5 w-3.5" />
-          New Assignment
-        </Button>
+        <CreateAssignmentDialog
+          onAssignmentCreated={refresh}
+          classes={classes}
+          batches={batches}
+          subjects={subjects}
+          classSubjects={classSubjects}
+        />
       </div>
 
       <Tabs defaultValue="all">
