@@ -11,9 +11,10 @@ import { Badge } from "@/components/ui/badge"
 import { Plus, Users, FileText } from "lucide-react"
 import { useClasses } from "@/hooks/useClasses"
 import { CreateClassDialog } from "@/components/CreateClassDialog"
+import { EditClassDialog } from "@/components/EditClassDialog"
 
 export function ClassesPage() {
-  const { classes, loading, error, refresh } = useClasses()
+  const { classes, loading, error, refresh, updateClass } = useClasses()
 
   if (loading) {
     return (
@@ -64,7 +65,10 @@ export function ClassesPage() {
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <CardTitle className="text-xl">{c.class.name}</CardTitle>
-                  <Badge variant="secondary">Active</Badge>
+                  <EditClassDialog
+                    classData={c.class}
+                    updateClass={updateClass}
+                  />
                 </div>
                 {c.class.description && (
                   <CardDescription>{c.class.description}</CardDescription>
