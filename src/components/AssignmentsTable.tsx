@@ -12,10 +12,12 @@ import { FileText } from "lucide-react"
 import type { EnrichedAssignment } from "@/hooks/useAssignments"
 import type { Assignment, Class, Batch, Subject, ClassSubject } from "@/types"
 import { EditAssignmentDialog } from "@/components/EditAssignmentDialog"
+import { DeleteAssignmentDialog } from "@/components/DeleteAssignmentDialog"
 
 interface AssignmentTableProps {
   assignments: EnrichedAssignment[]
   updateAssignment: (id: string, data: Partial<Assignment>) => Promise<void>
+  deleteAssignment: (id: string) => Promise<void>
   classes: Class[]
   batches: Batch[]
   subjects: Subject[]
@@ -25,6 +27,7 @@ interface AssignmentTableProps {
 export function AssignmentsTable({
   assignments,
   updateAssignment,
+  deleteAssignment,
   classes,
   batches,
   subjects,
@@ -89,14 +92,20 @@ export function AssignmentsTable({
                   </Badge>
                 </TableCell>
                 <TableCell className="text-right">
-                  <EditAssignmentDialog
-                    assignment={a.assignment}
-                    updateAssignment={updateAssignment}
-                    classes={classes}
-                    batches={batches}
-                    subjects={subjects}
-                    classSubjects={classSubjects}
-                  />
+                  <div className="flex items-center justify-end gap-1">
+                    <EditAssignmentDialog
+                      assignment={a.assignment}
+                      updateAssignment={updateAssignment}
+                      classes={classes}
+                      batches={batches}
+                      subjects={subjects}
+                      classSubjects={classSubjects}
+                    />
+                    <DeleteAssignmentDialog
+                      assignmentTitle={a.assignment.title}
+                      onDelete={() => deleteAssignment(a.assignment.id)}
+                    />
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
