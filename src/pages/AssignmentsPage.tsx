@@ -14,6 +14,7 @@ export function AssignmentsPage() {
     subjects,
     classSubjects,
     updateAssignment,
+    deleteAssignment,
   } = useAssignments()
 
   if (loading) {
@@ -71,6 +72,7 @@ export function AssignmentsPage() {
           <AssignmentsTable
             assignments={assignments}
             updateAssignment={updateAssignment}
+            deleteAssignment={deleteAssignment}
             classes={classes}
             batches={batches}
             subjects={subjects}
@@ -81,6 +83,7 @@ export function AssignmentsPage() {
           <AssignmentsTable
             assignments={assignments.filter((a) => a.status === "Active")}
             updateAssignment={updateAssignment}
+            deleteAssignment={deleteAssignment}
             classes={classes}
             batches={batches}
             subjects={subjects}
@@ -91,6 +94,7 @@ export function AssignmentsPage() {
           <AssignmentsTable
             assignments={assignments.filter((a) => a.status === "Completed")}
             updateAssignment={updateAssignment}
+            deleteAssignment={deleteAssignment}
             classes={classes}
             batches={batches}
             subjects={subjects}
