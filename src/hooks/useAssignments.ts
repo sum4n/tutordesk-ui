@@ -28,6 +28,7 @@ interface AssignmentData {
   subjects: Subject[]
   classSubjects: ClassSubject[]
   updateAssignment: (id: string, data: Partial<Assignment>) => Promise<void>
+  deleteAssignment: (id: string) => Promise<void>
 }
 
 export function useAssignments(): AssignmentData {
@@ -148,6 +149,22 @@ export function useAssignments(): AssignmentData {
     [fetchAssignmentData]
   )
 
+  const deleteAssignment = useCallback(
+    async (id: string) => {
+      const apiUrl = import.meta.env.VITE_API_BASE_URL
+      const response = await fetch(`${apiUrl}/assignments/${id}`, {
+        method: "DELETE",
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to delete assignment")
+      }
+
+      await fetchAssignmentData()
+    },
+    [fetchAssignmentData]
+  )
+
   useEffect(() => {
     fetchAssignmentData()
   }, [fetchAssignmentData])
@@ -162,5 +179,6 @@ export function useAssignments(): AssignmentData {
     subjects,
     classSubjects,
     updateAssignment,
+    deleteAssignment,
   }
 }
