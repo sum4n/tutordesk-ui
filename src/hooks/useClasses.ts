@@ -25,6 +25,7 @@ interface ClassesData {
     id: string,
     data: { name: string; description: string }
   ) => Promise<void>
+  deleteClass: (id: string) => Promise<void>
 }
 
 export function useClasses(): ClassesData {
@@ -122,11 +123,34 @@ export function useClasses(): ClassesData {
     [fetchClassData]
   )
 
+  const deleteClass = useCallback(
+    async (id: string) => {
+      const apiUrl = import.meta.env.VITE_API_BASE_URL
+      const response = await fetch(`${apiUrl}/classes/${id}`, {
+        method: "DELETE",
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to delete class")
+      }
+
+      await fetchClassData()
+    },
+    [fetchClassData]
+  )
+
   // Call it on mount
   useEffect(() => {
     fetchClassData()
   }, [fetchClassData])
 
   // Return the refresh function alongside the data
-  return { classes, loading, error, refresh: fetchClassData, updateClass }
+  return {
+    classes,
+    loading,
+    error,
+    refresh: fetchClassData,
+    updateClass,
+    deleteClass,
+  }
 }
