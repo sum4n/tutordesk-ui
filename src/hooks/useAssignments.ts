@@ -27,6 +27,7 @@ interface AssignmentData {
   batches: Batch[]
   subjects: Subject[]
   classSubjects: ClassSubject[]
+  updateAssignment: (id: string, data: Partial<Assignment>) => Promise<void>
 }
 
 export function useAssignments(): AssignmentData {
@@ -129,6 +130,24 @@ export function useAssignments(): AssignmentData {
     }
   }, [])
 
+  const updateAssignment = useCallback(
+    async (id: string, data: Partial<Assignment>) => {
+      const apiUrl = import.meta.env.VITE_API_BASE_URL
+      const response = await fetch(`${apiUrl}/assignments/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to update assignment")
+      }
+
+      await fetchAssignmentData()
+    },
+    [fetchAssignmentData]
+  )
+
   useEffect(() => {
     fetchAssignmentData()
   }, [fetchAssignmentData])
@@ -142,5 +161,6 @@ export function useAssignments(): AssignmentData {
     batches,
     subjects,
     classSubjects,
+    updateAssignment,
   }
 }
