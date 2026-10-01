@@ -12,9 +12,11 @@ import { Plus, Users, FileText } from "lucide-react"
 import { useClasses } from "@/hooks/useClasses"
 import { CreateClassDialog } from "@/components/CreateClassDialog"
 import { EditClassDialog } from "@/components/EditClassDialog"
+import { DeleteClassDialog } from "@/components/DeleteClassDialog"
 
 export function ClassesPage() {
-  const { classes, loading, error, refresh, updateClass } = useClasses()
+  const { classes, loading, error, refresh, updateClass, deleteClass } =
+    useClasses()
 
   if (loading) {
     return (
@@ -65,10 +67,16 @@ export function ClassesPage() {
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <CardTitle className="text-xl">{c.class.name}</CardTitle>
-                  <EditClassDialog
-                    classData={c.class}
-                    updateClass={updateClass}
-                  />
+                  <div className="flex items-center gap-1">
+                    <EditClassDialog
+                      classData={c.class}
+                      updateClass={updateClass}
+                    />
+                    <DeleteClassDialog
+                      nameOfClass={c.class.name}
+                      onDelete={() => deleteClass(c.class.id)}
+                    />
+                  </div>
                 </div>
                 {c.class.description && (
                   <CardDescription>{c.class.description}</CardDescription>
