@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -11,12 +10,26 @@ import {
 } from "@/components/ui/table"
 import { FileText } from "lucide-react"
 import type { EnrichedAssignment } from "@/hooks/useAssignments"
+import type { Assignment, Class, Batch, Subject, ClassSubject } from "@/types"
+import { EditAssignmentDialog } from "@/components/EditAssignmentDialog"
+
+interface AssignmentTableProps {
+  assignments: EnrichedAssignment[]
+  updateAssignment: (id: string, data: Partial<Assignment>) => Promise<void>
+  classes: Class[]
+  batches: Batch[]
+  subjects: Subject[]
+  classSubjects: ClassSubject[]
+}
 
 export function AssignmentsTable({
   assignments,
-}: {
-  assignments: EnrichedAssignment[]
-}) {
+  updateAssignment,
+  classes,
+  batches,
+  subjects,
+  classSubjects,
+}: AssignmentTableProps) {
   return (
     <Card>
       <CardContent className="p-0">
@@ -76,9 +89,14 @@ export function AssignmentsTable({
                   </Badge>
                 </TableCell>
                 <TableCell className="text-right">
-                  <Button variant="ghost" size="sm">
-                    Manage
-                  </Button>
+                  <EditAssignmentDialog
+                    assignment={a.assignment}
+                    updateAssignment={updateAssignment}
+                    classes={classes}
+                    batches={batches}
+                    subjects={subjects}
+                    classSubjects={classSubjects}
+                  />
                 </TableCell>
               </TableRow>
             ))}
