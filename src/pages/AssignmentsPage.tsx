@@ -13,6 +13,7 @@ export function AssignmentsPage() {
     batches,
     subjects,
     classSubjects,
+    updateAssignment,
   } = useAssignments()
 
   if (loading) {
@@ -67,16 +68,33 @@ export function AssignmentsPage() {
         </TabsList>
 
         <TabsContent value="all" className="mt-4">
-          <AssignmentsTable assignments={assignments} />
+          <AssignmentsTable
+            assignments={assignments}
+            updateAssignment={updateAssignment}
+            classes={classes}
+            batches={batches}
+            subjects={subjects}
+            classSubjects={classSubjects}
+          />
         </TabsContent>
         <TabsContent value="active" className="mt-4">
           <AssignmentsTable
             assignments={assignments.filter((a) => a.status === "Active")}
+            updateAssignment={updateAssignment}
+            classes={classes}
+            batches={batches}
+            subjects={subjects}
+            classSubjects={classSubjects}
           />
         </TabsContent>
         <TabsContent value="completed" className="mt-4">
           <AssignmentsTable
             assignments={assignments.filter((a) => a.status === "Completed")}
+            updateAssignment={updateAssignment}
+            classes={classes}
+            batches={batches}
+            subjects={subjects}
+            classSubjects={classSubjects}
           />
         </TabsContent>
       </Tabs>
