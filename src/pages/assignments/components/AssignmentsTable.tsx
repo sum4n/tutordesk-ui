@@ -9,10 +9,10 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { FileText } from "lucide-react"
-import type { EnrichedAssignment } from "@/hooks/useAssignments"
+import type { EnrichedAssignment } from "@/pages/assignments/hooks/useAssignments"
 import type { Assignment, Class, Batch, Subject, ClassSubject } from "@/types"
-import { EditAssignmentDialog } from "@/components/EditAssignmentDialog"
-import { DeleteAssignmentDialog } from "@/components/DeleteAssignmentDialog"
+import { EditAssignmentDialog } from "@/pages/assignments/components/EditAssignmentDialog"
+import { DeleteAssignmentDialog } from "@/pages/assignments/components/DeleteAssignmentDialog"
 
 interface AssignmentTableProps {
   assignments: EnrichedAssignment[]

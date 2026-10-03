@@ -18,10 +18,13 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Plus } from "lucide-react"
-import { useStudents } from "@/hooks/useStudents"
+import { useStudents } from "@/pages/students/hooks/useStudents"
 import { useClasses } from "@/hooks/useClasses"
 import { useState } from "react"
-import { useFilteredStudents, ALL_CLASSES } from "@/hooks/useFilteredStudents"
+import {
+  useFilteredStudents,
+  ALL_CLASSES,
+} from "@/pages/students/hooks/useFilteredStudents"
 
 export function StudentsPage() {
   const {

@@ -1,7 +1,7 @@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import { useAssignments } from "@/hooks/useAssignments"
-import { AssignmentsTable } from "@/components/AssignmentsTable"
-import { CreateAssignmentDialog } from "@/components/CreateAssignmentDialog"
+import { useAssignments } from "@/pages/assignments/hooks/useAssignments"
+import { AssignmentsTable } from "@/pages/assignments/components/AssignmentsTable"
+import { CreateAssignmentDialog } from "@/pages/assignments/components/CreateAssignmentDialog"
 
 export function AssignmentsPage() {
   const {

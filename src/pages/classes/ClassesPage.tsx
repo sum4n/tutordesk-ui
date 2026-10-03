@@ -10,9 +10,9 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Plus, Users, FileText } from "lucide-react"
 import { useClasses } from "@/hooks/useClasses"
-import { CreateClassDialog } from "@/components/CreateClassDialog"
-import { EditClassDialog } from "@/components/EditClassDialog"
-import { DeleteClassDialog } from "@/components/DeleteClassDialog"
+import { CreateClassDialog } from "@/pages/classes/components/CreateClassDialog"
+import { EditClassDialog } from "@/pages/classes/components/EditClassDialog"
+import { DeleteClassDialog } from "@/pages/classes/components/DeleteClassDialog"
 
 export function ClassesPage() {
   const { classes, loading, error, refresh, updateClass, deleteClass } =

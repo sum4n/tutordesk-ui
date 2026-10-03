@@ -1,11 +1,11 @@
 import { Routes, Route, Navigate, useLocation } from "react-router"
 import { Sidebar } from "@/components/layout/Sidebar"
 import { TopBar } from "@/components/layout/TopBar"
-import { DashboardPage } from "@/pages/DashboardPage"
-import { ClassesPage } from "@/pages/ClassesPage"
-import { StudentsPage } from "@/pages/StudentsPage"
-import { AssignmentsPage } from "@/pages/AssignmentsPage"
-import { SubmissionsPage } from "@/pages/SubmissionsPage"
+import { DashboardPage } from "@/pages/dashboard/DashboardPage"
+import { ClassesPage } from "@/pages/classes/ClassesPage"
+import { StudentsPage } from "@/pages/students/StudentsPage"
+import { AssignmentsPage } from "@/pages/assignments/AssignmentsPage"
+import { SubmissionsPage } from "@/pages/submissions/SubmissionsPage"
 import { pageMeta } from "@/config/appConfig"
 import type { PageKey } from "@/types"
 
@@ -15,9 +15,6 @@ export default function App() {
   // Extract current page form URL
   const currentPage = location.pathname.slice(1) || "dashboard"
   const meta = pageMeta[currentPage as PageKey] || pageMeta.dashboard
-
-  // const [page, setPage] = useState<PageKey>("dashboard")
-  // const meta = pageMeta[page]
 
   return (
     <div className="flex h-screen bg-background text-foreground">

@@ -18,13 +18,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { useSubmissions } from "@/hooks/useSubmissions"
+import { useSubmissions } from "@/pages/submissions/hooks/useSubmissions"
 import { useClasses } from "@/hooks/useClasses"
 import {
   useFilteredSubmissions,
   ALL_STATUSES,
   ALL_CLASSES,
-} from "@/hooks/useFilteredSubmissions"
+} from "@/pages/submissions/hooks/useFilteredSubmissions"
 import { formatDate, getStatusVariant } from "@/lib/utils"
 
 export function SubmissionsPage() {

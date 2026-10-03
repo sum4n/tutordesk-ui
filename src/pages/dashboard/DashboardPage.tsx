@@ -16,7 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { useDashboard } from "@/hooks/useDashboard"
+import { useDashboard } from "@/pages/dashboard/hooks/useDashboard"
 
 export function DashboardPage() {
   const navigate = useNavigate()
