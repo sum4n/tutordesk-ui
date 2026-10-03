@@ -5,6 +5,7 @@ import {
   Users,
   FileText,
   FilePen,
+  BookOpen,
 } from "lucide-react"
 
 export const navItems: NavItem[] = [
@@ -13,6 +14,7 @@ export const navItems: NavItem[] = [
   { key: "students", label: "Students", Icon: Users },
   { key: "assignments", label: "Assignments", Icon: FileText },
   { key: "submissions", label: "Submissions", Icon: FilePen },
+  { key: "subjects", label: "Subjects", Icon: BookOpen },
 ]
 
 export const pageMeta: Record<PageKey, PageMeta> = {
@@ -29,5 +31,9 @@ export const pageMeta: Record<PageKey, PageMeta> = {
   submissions: {
     title: "Submissions",
     subtitle: "Check submissions",
+  },
+  subjects: {
+    title: "Subjects",
+    subtitle: "Manage subjects",
   },
 }
