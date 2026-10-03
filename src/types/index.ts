@@ -1,5 +1,10 @@
 export type PageKey =
-  "dashboard" | "classes" | "students" | "assignments" | "submissions"
+  | "dashboard"
+  | "classes"
+  | "students"
+  | "assignments"
+  | "submissions"
+  | "subjects"
 
 export interface NavItem {
   key: PageKey
@@ -34,6 +39,7 @@ export interface Batch {
 export interface Subject {
   id: string
   name: string
+  description: string | null
 }
 
 export interface ClassSubject {
