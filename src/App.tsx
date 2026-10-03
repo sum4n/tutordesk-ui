@@ -6,6 +6,7 @@ import { ClassesPage } from "@/pages/classes/ClassesPage"
 import { StudentsPage } from "@/pages/students/StudentsPage"
 import { AssignmentsPage } from "@/pages/assignments/AssignmentsPage"
 import { SubmissionsPage } from "@/pages/submissions/SubmissionsPage"
+import { SubjectsPage } from "@/pages/subjects/SubjectsPage"
 import { pageMeta } from "@/config/appConfig"
 import type { PageKey } from "@/types"
 
@@ -30,6 +31,7 @@ export default function App() {
             <Route path="/students" element={<StudentsPage />} />
             <Route path="/assignments" element={<AssignmentsPage />} />
             <Route path="/submissions" element={<SubmissionsPage />} />
+            <Route path="/subjects" element={<SubjectsPage />} />
           </Routes>
         </main>
       </div>
