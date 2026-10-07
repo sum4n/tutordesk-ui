@@ -98,21 +98,6 @@ export function ClassesPage() {
                     <p className="text-sm text-muted-foreground">No batches</p>
                   )}
                 </div>
-
-                <div>
-                  <p className="mb-2 text-sm font-medium">Subjects</p>
-                  {c.subjects.length > 0 ? (
-                    <div className="flex flex-wrap gap-1">
-                      {c.subjects.map((s) => (
-                        <Badge key={s.id} variant="secondary">
-                          {s.name}
-                        </Badge>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">No subjects</p>
-                  )}
-                </div>
               </CardContent>
 
               <CardFooter className="border-t pt-4">

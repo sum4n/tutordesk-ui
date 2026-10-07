@@ -35,23 +35,6 @@
       "name": "Physical Science"
     }
   ],
-  "classSubjects": [
-    {
-      "id": "1",
-      "classId": "1",
-      "subjectId": "1"
-    },
-    {
-      "id": "2",
-      "classId": "1",
-      "subjectId": "2"
-    },
-    {
-      "id": "3",
-      "classId": "2",
-      "subjectId": "2"
-    }
-  ],
   "students": [
     {
       "id": "1",

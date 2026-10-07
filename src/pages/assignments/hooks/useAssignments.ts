@@ -6,7 +6,6 @@ import type {
   Student,
   Batch,
   Subject,
-  ClassSubject,
 } from "@/types"
 
 export interface EnrichedAssignment {
@@ -26,7 +25,6 @@ interface AssignmentData {
   classes: Class[]
   batches: Batch[]
   subjects: Subject[]
-  classSubjects: ClassSubject[]
   updateAssignment: (id: string, data: Partial<Assignment>) => Promise<void>
   deleteAssignment: (id: string) => Promise<void>
 }
@@ -36,7 +34,6 @@ export function useAssignments(): AssignmentData {
   const [classes, setClasses] = useState<Class[]>([])
   const [batches, setBatches] = useState<Batch[]>([])
   const [subjects, setSubjects] = useState<Subject[]>([])
-  const [classSubjects, setClassSubjects] = useState<ClassSubject[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -51,7 +48,6 @@ export function useAssignments(): AssignmentData {
         studentsRes,
         submissionsRes,
         subjectsRes,
-        classSubjectsRes,
       ] = await Promise.all([
         fetch(`${apiUrl}/assignments`),
         fetch(`${apiUrl}/classes`),
@@ -59,7 +55,6 @@ export function useAssignments(): AssignmentData {
         fetch(`${apiUrl}/students`),
         fetch(`${apiUrl}/submissions`),
         fetch(`${apiUrl}/subjects`),
-        fetch(`${apiUrl}/classSubjects`),
       ])
 
       if (
@@ -68,8 +63,7 @@ export function useAssignments(): AssignmentData {
         !batchesRes.ok ||
         !studentsRes.ok ||
         !submissionsRes.ok ||
-        !subjectsRes.ok ||
-        !classSubjectsRes.ok
+        !subjectsRes.ok
       ) {
         throw new Error("Failed to fetch assignment data")
       }
@@ -80,7 +74,6 @@ export function useAssignments(): AssignmentData {
       const students: Student[] = await studentsRes.json()
       const submissions: Submission[] = await submissionsRes.json()
       const subjectsData: Subject[] = await subjectsRes.json()
-      const classSubjectsData: ClassSubject[] = await classSubjectsRes.json()
 
       const enrichedAssignments: EnrichedAssignment[] = assignmentsData.map(
         (a) => {
@@ -122,7 +115,6 @@ export function useAssignments(): AssignmentData {
       setClasses(classesData)
       setBatches(batchesData)
       setSubjects(subjectsData)
-      setClassSubjects(classSubjectsData)
       setError(null)
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred")
@@ -177,7 +169,6 @@ export function useAssignments(): AssignmentData {
     classes,
     batches,
     subjects,
-    classSubjects,
     updateAssignment,
     deleteAssignment,
   }

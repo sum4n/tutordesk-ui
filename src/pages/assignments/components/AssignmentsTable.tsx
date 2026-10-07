@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table"
 import { FileText } from "lucide-react"
 import type { EnrichedAssignment } from "@/pages/assignments/hooks/useAssignments"
-import type { Assignment, Class, Batch, Subject, ClassSubject } from "@/types"
+import type { Assignment, Class, Batch, Subject } from "@/types"
 import { EditAssignmentDialog } from "@/pages/assignments/components/EditAssignmentDialog"
 import { DeleteAssignmentDialog } from "@/pages/assignments/components/DeleteAssignmentDialog"
 
@@ -21,7 +21,6 @@ interface AssignmentTableProps {
   classes: Class[]
   batches: Batch[]
   subjects: Subject[]
-  classSubjects: ClassSubject[]
 }
 
 export function AssignmentsTable({
@@ -31,7 +30,6 @@ export function AssignmentsTable({
   classes,
   batches,
   subjects,
-  classSubjects,
 }: AssignmentTableProps) {
   return (
     <Card>
@@ -99,7 +97,6 @@ export function AssignmentsTable({
                       classes={classes}
                       batches={batches}
                       subjects={subjects}
-                      classSubjects={classSubjects}
                     />
                     <DeleteAssignmentDialog
                       assignmentTitle={a.assignment.title}

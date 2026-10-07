@@ -1,19 +1,11 @@
 import { useEffect, useState, useCallback } from "react"
-import type {
-  Class,
-  Student,
-  Assignment,
-  Batch,
-  Subject,
-  ClassSubject,
-} from "@/types"
+import type { Class, Student, Assignment, Batch } from "@/types"
 
 interface ClassDetails {
   class: Class
   studentCount: number
   assignmentCount: number
   batches: { id: string; name: string }[]
-  subjects: { id: string; name: string }[]
 }
 
 interface ClassesData {
@@ -38,29 +30,20 @@ export function useClasses(): ClassesData {
     try {
       setLoading(true)
       const apiUrl = import.meta.env.VITE_API_BASE_URL
-      const [
-        classesRes,
-        studentsRes,
-        assignmentsRes,
-        batchesRes,
-        subjectsRes,
-        classSubjectsRes,
-      ] = await Promise.all([
-        fetch(`${apiUrl}/classes`),
-        fetch(`${apiUrl}/students`),
-        fetch(`${apiUrl}/assignments`),
-        fetch(`${apiUrl}/batches`),
-        fetch(`${apiUrl}/subjects`),
-        fetch(`${apiUrl}/classSubjects`),
-      ])
+      const [classesRes, studentsRes, assignmentsRes, batchesRes] =
+        await Promise.all([
+          fetch(`${apiUrl}/classes`),
+          fetch(`${apiUrl}/students`),
+          fetch(`${apiUrl}/assignments`),
+          fetch(`${apiUrl}/batches`),
+          fetch(`${apiUrl}/subjects`),
+        ])
 
       if (
         !classesRes.ok ||
         !studentsRes.ok ||
         !assignmentsRes.ok ||
-        !batchesRes.ok ||
-        !subjectsRes.ok ||
-        !classSubjectsRes.ok
+        !batchesRes.ok
       ) {
         throw new Error("Failed to fetch data")
       }
@@ -69,8 +52,6 @@ export function useClasses(): ClassesData {
       const students: Student[] = await studentsRes.json()
       const assignments: Assignment[] = await assignmentsRes.json()
       const batches: Batch[] = await batchesRes.json()
-      const subjects: Subject[] = await subjectsRes.json()
-      const classSubjects: ClassSubject[] = await classSubjectsRes.json()
 
       const classesDetails: ClassDetails[] = classesData.map((c) => {
         const studentCount = students.filter((s) => s.classId === c.id).length
@@ -78,20 +59,12 @@ export function useClasses(): ClassesData {
           (a) => a.classId === c.id
         ).length
         const filteredBatches = batches.filter((b) => b.classId === c.id)
-        const filteredClassSubjects = classSubjects.filter(
-          (cs) => cs.classId === c.id
-        )
-        const subjectIds = filteredClassSubjects.map((cs) => cs.subjectId)
-        const filteredSubjects = subjects.filter((s) =>
-          subjectIds.includes(s.id)
-        )
 
         return {
           class: c,
           studentCount,
           assignmentCount,
           batches: filteredBatches,
-          subjects: filteredSubjects,
         }
       })
 

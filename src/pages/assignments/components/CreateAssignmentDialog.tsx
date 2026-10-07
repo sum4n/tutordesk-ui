@@ -20,14 +20,13 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Plus } from "lucide-react"
-import type { Class, Batch, Subject, ClassSubject } from "@/types"
+import type { Class, Batch, Subject } from "@/types"
 
 interface CreateAssignmentDialogProps {
   onAssignmentCreated: () => void
   classes: Class[]
   batches: Batch[]
   subjects: Subject[]
-  classSubjects: ClassSubject[]
 }
 
 export function CreateAssignmentDialog({
@@ -35,7 +34,6 @@ export function CreateAssignmentDialog({
   classes,
   batches,
   subjects,
-  classSubjects,
 }: CreateAssignmentDialogProps) {
   const [open, setOpen] = useState(false)
   const [title, setTitle] = useState("")
@@ -54,13 +52,6 @@ export function CreateAssignmentDialog({
 
   // Filter batches by selected class
   const filteredBatches = batches.filter((b) => b.classId === selectedClassId)
-
-  // Filter subjects by selected class
-  const filteredSubjects = subjects.filter((s) =>
-    classSubjects.some(
-      (cs) => cs.classId === selectedClassId && cs.subjectId === s.id
-    )
-  )
 
   const handleSubmit = async (event: React.SubmitEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -178,7 +169,6 @@ export function CreateAssignmentDialog({
                     if (value !== null) {
                       setClassName(value)
                       setBatchName("none")
-                      setSubjectName("")
                     }
                   }}
                   required
@@ -228,14 +218,13 @@ export function CreateAssignmentDialog({
                   onValueChange={(value) => {
                     if (value !== null) setSubjectName(value)
                   }}
-                  disabled={!className || filteredSubjects.length === 0}
                   required
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select subject" />
                   </SelectTrigger>
                   <SelectContent>
-                    {filteredSubjects.map((s) => (
+                    {subjects.map((s) => (
                       <SelectItem key={s.id} value={s.name}>
                         {s.name}
                       </SelectItem>

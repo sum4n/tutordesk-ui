@@ -12,7 +12,6 @@ export function AssignmentsPage() {
     classes,
     batches,
     subjects,
-    classSubjects,
     updateAssignment,
     deleteAssignment,
   } = useAssignments()
@@ -55,7 +54,6 @@ export function AssignmentsPage() {
           classes={classes}
           batches={batches}
           subjects={subjects}
-          classSubjects={classSubjects}
         />
       </div>
 
@@ -76,7 +74,6 @@ export function AssignmentsPage() {
             classes={classes}
             batches={batches}
             subjects={subjects}
-            classSubjects={classSubjects}
           />
         </TabsContent>
         <TabsContent value="active" className="mt-4">
@@ -87,7 +84,6 @@ export function AssignmentsPage() {
             classes={classes}
             batches={batches}
             subjects={subjects}
-            classSubjects={classSubjects}
           />
         </TabsContent>
         <TabsContent value="completed" className="mt-4">
@@ -98,7 +94,6 @@ export function AssignmentsPage() {
             classes={classes}
             batches={batches}
             subjects={subjects}
-            classSubjects={classSubjects}
           />
         </TabsContent>
       </Tabs>
