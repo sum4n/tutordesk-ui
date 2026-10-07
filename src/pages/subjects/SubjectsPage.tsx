@@ -11,6 +11,8 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { BookOpen } from "lucide-react"
 
 export function SubjectsPage() {
   const {
@@ -34,6 +36,38 @@ export function SubjectsPage() {
     return (
       <div className="flex h-full items-center justify-center">
         <p className="text-red-500">Error: {error}</p>
+      </div>
+    )
+  }
+
+  if (subjects.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-center">
+        <BookOpen className="mb-4 h-12 w-12 text-muted-foreground" />
+        <h3 className="text-lg font-semibold">No subjects yet</h3>
+        <p className="mb-6 max-w-sm text-sm text-muted-foreground">
+          Add the subjects you teach to get started. You can always add more
+          later.
+        </p>
+
+        <CreateSubjectDialog createSubject={createSubject} />
+
+        <div className="mt-4 flex flex-wrap justify-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => createSubject({ name: "Mathematics" })}
+          >
+            + Mathematics
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => createSubject({ name: "Physical Science" })}
+          >
+            + Physical Science
+          </Button>
+        </div>
       </div>
     )
   }
