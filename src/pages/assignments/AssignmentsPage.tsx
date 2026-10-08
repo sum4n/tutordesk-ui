@@ -2,6 +2,10 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { useAssignments } from "@/pages/assignments/hooks/useAssignments"
 import { AssignmentsTable } from "@/pages/assignments/components/AssignmentsTable"
 import { CreateAssignmentDialog } from "@/pages/assignments/components/CreateAssignmentDialog"
+import { Card } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { FileText } from "lucide-react"
+import { Link } from "react-router"
 
 export function AssignmentsPage() {
   const {
@@ -32,6 +36,60 @@ export function AssignmentsPage() {
     )
   }
 
+  if (error) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <p className="text-red-500">Error: {error}</p>
+      </div>
+    )
+  }
+
+  const hasClasses = classes.length > 0
+  const hasSubjects = subjects.length > 0
+  const canCreateAssignment = hasClasses && hasSubjects
+
+  if (!canCreateAssignment) {
+    return (
+      <div className="space-y-6 p-6">
+        <div>
+          <h2 className="text-xl font-semibold">Assignments</h2>
+          <p className="text-sm text-muted-foreground">
+            Upload PDFs and track student submissions
+          </p>
+        </div>
+        <Card className="p-12 text-center">
+          <FileText className="m-auto h-12 w-12 text-muted-foreground" />
+          <h3 className="mb-2 text-lg font-semibold">
+            {!hasClasses && !hasSubjects
+              ? "Create a class and subject first"
+              : !hasClasses
+                ? "Create a class first"
+                : "Create a subject first"}
+          </h3>
+          <p className="mb-4 text-muted-foreground">
+            {!hasClasses && !hasSubjects
+              ? "You need at least one class and one subject before you can create assignments."
+              : !hasClasses
+                ? "You need at least one class before you can create assignments."
+                : "You need at least one subject before you can create assignments."}
+          </p>
+          <div className="flex justify-center gap-3">
+            {!hasClasses && (
+              <Link to="/classes">
+                <Button>Create Class</Button>
+              </Link>
+            )}
+            {!hasSubjects && (
+              <Link to="/subjects">
+                <Button>Create Subject</Button>
+              </Link>
+            )}
+          </div>
+        </Card>
+      </div>
+    )
+  }
+
   const totalAssignments = assignments.length
   const activeAssignments = assignments.filter(
     (assignment) => assignment.status === "Active"
@@ -56,47 +114,64 @@ export function AssignmentsPage() {
           subjects={subjects}
         />
       </div>
+      {assignments.length === 0 ? (
+        <Card className="p-12 text-center">
+          <FileText className="m-auto h-12 w-12 text-muted-foreground" />
+          <h3 className="mb-2 text-lg font-semibold">No assignments yet</h3>
+          <p className="mb-4 text-muted-foreground">
+            Create your first assignment to get started
+          </p>
+          <CreateAssignmentDialog
+            onAssignmentCreated={refresh}
+            classes={classes}
+            batches={batches}
+            subjects={subjects}
+          />
+        </Card>
+      ) : (
+        <Tabs defaultValue="all">
+          <TabsList>
+            <TabsTrigger value="all">All ({totalAssignments})</TabsTrigger>
+            <TabsTrigger value="active">
+              Active ({activeAssignments})
+            </TabsTrigger>
+            <TabsTrigger value="completed">
+              Completed ({completedAssignments})
+            </TabsTrigger>
+          </TabsList>
 
-      <Tabs defaultValue="all">
-        <TabsList>
-          <TabsTrigger value="all">All ({totalAssignments})</TabsTrigger>
-          <TabsTrigger value="active">Active ({activeAssignments})</TabsTrigger>
-          <TabsTrigger value="completed">
-            Completed ({completedAssignments})
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="all" className="mt-4">
-          <AssignmentsTable
-            assignments={assignments}
-            updateAssignment={updateAssignment}
-            deleteAssignment={deleteAssignment}
-            classes={classes}
-            batches={batches}
-            subjects={subjects}
-          />
-        </TabsContent>
-        <TabsContent value="active" className="mt-4">
-          <AssignmentsTable
-            assignments={assignments.filter((a) => a.status === "Active")}
-            updateAssignment={updateAssignment}
-            deleteAssignment={deleteAssignment}
-            classes={classes}
-            batches={batches}
-            subjects={subjects}
-          />
-        </TabsContent>
-        <TabsContent value="completed" className="mt-4">
-          <AssignmentsTable
-            assignments={assignments.filter((a) => a.status === "Completed")}
-            updateAssignment={updateAssignment}
-            deleteAssignment={deleteAssignment}
-            classes={classes}
-            batches={batches}
-            subjects={subjects}
-          />
-        </TabsContent>
-      </Tabs>
+          <TabsContent value="all" className="mt-4">
+            <AssignmentsTable
+              assignments={assignments}
+              updateAssignment={updateAssignment}
+              deleteAssignment={deleteAssignment}
+              classes={classes}
+              batches={batches}
+              subjects={subjects}
+            />
+          </TabsContent>
+          <TabsContent value="active" className="mt-4">
+            <AssignmentsTable
+              assignments={assignments.filter((a) => a.status === "Active")}
+              updateAssignment={updateAssignment}
+              deleteAssignment={deleteAssignment}
+              classes={classes}
+              batches={batches}
+              subjects={subjects}
+            />
+          </TabsContent>
+          <TabsContent value="completed" className="mt-4">
+            <AssignmentsTable
+              assignments={assignments.filter((a) => a.status === "Completed")}
+              updateAssignment={updateAssignment}
+              deleteAssignment={deleteAssignment}
+              classes={classes}
+              batches={batches}
+              subjects={subjects}
+            />
+          </TabsContent>
+        </Tabs>
+      )}
     </div>
   )
 }
