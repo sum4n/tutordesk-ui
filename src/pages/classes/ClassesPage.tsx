@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
@@ -8,7 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Plus, Users, FileText } from "lucide-react"
+import { Users, FileText, GraduationCap } from "lucide-react"
 import { useClasses } from "@/hooks/useClasses"
 import { CreateClassDialog } from "@/pages/classes/components/CreateClassDialog"
 import { EditClassDialog } from "@/pages/classes/components/EditClassDialog"
@@ -48,14 +47,12 @@ export function ClassesPage() {
 
       {classes.length === 0 ? (
         <Card className="p-12 text-center">
+          <GraduationCap className="m-auto h-12 w-12 text-muted-foreground" />
           <h3 className="mb-2 text-lg font-semibold">No classes yet</h3>
           <p className="mb-4 text-muted-foreground">
             Create your first class to get started
           </p>
-          <Button className="gap-1.5">
-            <Plus className="h-4 w-4" />
-            Create Class
-          </Button>
+          <CreateClassDialog onClassCreated={refresh} />
         </Card>
       ) : (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
