@@ -11,7 +11,6 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import { BookOpen } from "lucide-react"
 
 export function SubjectsPage() {
@@ -40,38 +39,6 @@ export function SubjectsPage() {
     )
   }
 
-  if (subjects.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-12 text-center">
-        <BookOpen className="mb-4 h-12 w-12 text-muted-foreground" />
-        <h3 className="text-lg font-semibold">No subjects yet</h3>
-        <p className="mb-6 max-w-sm text-sm text-muted-foreground">
-          Add the subjects you teach to get started. You can always add more
-          later.
-        </p>
-
-        <CreateSubjectDialog createSubject={createSubject} />
-
-        <div className="mt-4 flex flex-wrap justify-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => createSubject({ name: "Mathematics" })}
-          >
-            + Mathematics
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => createSubject({ name: "Physical Science" })}
-          >
-            + Physical Science
-          </Button>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="space-y-6 p-6">
       <div className="flex items-center justify-between">
@@ -83,40 +50,52 @@ export function SubjectsPage() {
         </div>
         <CreateSubjectDialog createSubject={createSubject} />
       </div>
-
-      <Card>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {subjects.map((subject) => (
-                <TableRow key={subject.id}>
-                  <TableCell className="font-medium">{subject.name}</TableCell>
-                  <TableCell>{subject.description || "—"}</TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-1">
-                      <EditSubjectDialog
-                        subject={subject}
-                        updateSubject={updateSubject}
-                      />
-                      <DeleteSubjectDialog
-                        subjectName={subject.name}
-                        onDelete={() => deleteSubject(subject.id)}
-                      />
-                    </div>
-                  </TableCell>
+      {subjects.length === 0 ? (
+        <Card className="p-12 text-center">
+          <BookOpen className="m-auto h-12 w-12 text-muted-foreground" />
+          <h3 className="mb-2 text-lg font-semibold">No subjects yet</h3>
+          <p className="mb-4 text-muted-foreground">
+            Create your first subject to get started
+          </p>
+          <CreateSubjectDialog createSubject={createSubject} />
+        </Card>
+      ) : (
+        <Card>
+          <CardContent className="p-0">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Description</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+              </TableHeader>
+              <TableBody>
+                {subjects.map((subject) => (
+                  <TableRow key={subject.id}>
+                    <TableCell className="font-medium">
+                      {subject.name}
+                    </TableCell>
+                    <TableCell>{subject.description || "—"}</TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        <EditSubjectDialog
+                          subject={subject}
+                          updateSubject={updateSubject}
+                        />
+                        <DeleteSubjectDialog
+                          subjectName={subject.name}
+                          onDelete={() => deleteSubject(subject.id)}
+                        />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      )}
     </div>
   )
 }
