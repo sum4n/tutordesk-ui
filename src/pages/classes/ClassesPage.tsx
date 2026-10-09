@@ -12,6 +12,7 @@ import { useClasses } from "@/hooks/useClasses"
 import { CreateClassDialog } from "@/pages/classes/components/CreateClassDialog"
 import { EditClassDialog } from "@/pages/classes/components/EditClassDialog"
 import { DeleteClassDialog } from "@/pages/classes/components/DeleteClassDialog"
+import { ManageBatchesDialog } from "@/pages/classes/components/ManageBatchesDialog"
 
 export function ClassesPage() {
   const { classes, loading, error, refresh, updateClass, deleteClass } =
@@ -82,7 +83,12 @@ export function ClassesPage() {
 
               <CardContent className="space-y-4">
                 <div>
-                  <p className="mb-2 text-sm font-medium">Batches</p>
+                  <ManageBatchesDialog
+                    classId={c.class.id}
+                    className={c.class.name}
+                    onBatchesChanged={refresh}
+                  />
+
                   {c.batches.length > 0 ? (
                     <div className="flex flex-wrap gap-1">
                       {c.batches.map((b) => (
