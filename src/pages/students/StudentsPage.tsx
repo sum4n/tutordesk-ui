@@ -1,14 +1,12 @@
-import { Button } from "@/components/ui/button"
+import { useState } from "react"
+import { useStudents } from "./hooks/useStudents"
+import { CreateStudentDialog } from "./components/CreateStudentDialog"
+import { EditStudentDialog } from "./components/EditStudentDialog"
+import { DeleteStudentDialog } from "./components/DeleteStudentDialog"
+import { useFilteredStudents, ALL_CLASSES } from "./hooks/useFilteredStudents"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
 import {
   Select,
@@ -17,44 +15,118 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Plus } from "lucide-react"
-import { useStudents } from "@/pages/students/hooks/useStudents"
-import { useClasses } from "@/hooks/useClasses"
-import { useState } from "react"
 import {
-  useFilteredStudents,
-  ALL_CLASSES,
-} from "@/pages/students/hooks/useFilteredStudents"
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import { Users, GraduationCap } from "lucide-react"
+import { Link } from "react-router"
 
 export function StudentsPage() {
   const {
     students,
-    loading: studentsLoading,
-    error: studentsError,
+    classes,
+    batches,
+    assignments,
+    submissions,
+    loading,
+    error,
+    createStudent,
+    updateStudent,
+    deleteStudent,
   } = useStudents()
-  const { classes, loading: classesLoading, error: classesError } = useClasses()
 
   const [selectedClass, setSelectedClass] = useState<string>(ALL_CLASSES)
   const [searchQuery, setSearchQuery] = useState<string>("")
 
   const { searchedStudents } = useFilteredStudents({
     students,
+    classes,
+    batches,
+    assignments,
+    submissions,
     selectedClass,
     searchQuery,
   })
 
-  if (studentsLoading || classesLoading) {
+  if (loading) {
     return (
       <div className="flex h-full items-center justify-center">
-        <p className="text-muted-foreground">Loading...</p>
+        <p className="text-muted-foreground">Loading students...</p>
       </div>
     )
   }
 
-  if (studentsError || classesError) {
+  if (error) {
     return (
       <div className="flex h-full items-center justify-center">
-        <p className="text-red-500">Error: {studentsError || classesError}</p>
+        <p className="text-red-500">Error: {error}</p>
+      </div>
+    )
+  }
+
+  const hasClasses = classes.length > 0
+
+  // Prerequisite guard
+  if (!hasClasses) {
+    return (
+      <div className="space-y-6 p-6">
+        <div>
+          <h2 className="text-xl font-semibold">Students</h2>
+          <p className="text-sm text-muted-foreground">
+            Manage students enrolled in your tuition center
+          </p>
+        </div>
+        <Card className="p-12 text-center">
+          <Users className="m-auto h-12 w-12 text-muted-foreground" />
+          <h3 className="mb-2 text-lg font-semibold">Create a class first</h3>
+          <p className="mb-4 text-muted-foreground">
+            You need at least one class before you can add students.
+          </p>
+          <Link to="/classes">
+            <Button>
+              <GraduationCap className="mr-2 h-4 w-4" />
+              Create Class
+            </Button>
+          </Link>
+        </Card>
+      </div>
+    )
+  }
+
+  // Empty state
+  if (students.length === 0) {
+    return (
+      <div className="space-y-6 p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-semibold">Students</h2>
+            <p className="text-sm text-muted-foreground">
+              Manage students enrolled in your tuition center
+            </p>
+          </div>
+          <CreateStudentDialog
+            onCreate={createStudent}
+            classes={classes}
+            batches={batches}
+          />
+        </div>
+        <Card className="p-12 text-center">
+          <Users className="m-auto h-12 w-12 text-muted-foreground" />
+          <h3 className="mb-2 text-lg font-semibold">No students yet</h3>
+          <p className="mb-4 text-muted-foreground">
+            Add your first student to get started.
+          </p>
+          <CreateStudentDialog
+            onCreate={createStudent}
+            classes={classes}
+            batches={batches}
+          />
+        </Card>
       </div>
     )
   }
@@ -68,10 +140,11 @@ export function StudentsPage() {
             All students across your classes
           </p>
         </div>
-        <Button size="sm" className="gap-1.5">
-          <Plus className="h-3.5 w-3.5" />
-          Add Student
-        </Button>
+        <CreateStudentDialog
+          onCreate={createStudent}
+          classes={classes}
+          batches={batches}
+        />
       </div>
 
       <Card>
@@ -80,24 +153,18 @@ export function StudentsPage() {
             <Input
               placeholder="Search students..."
               className="flex-1"
-              onChange={(e) => {
-                setSearchQuery(e.target.value)
-              }}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
-            <Select
-              defaultValue={ALL_CLASSES}
-              onValueChange={(value) => {
-                if (value) setSelectedClass(value)
-              }}
-            >
+            <Select value={selectedClass} onValueChange={setSelectedClass}>
               <SelectTrigger className="w-40">
                 <SelectValue placeholder="Filter by class" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value={ALL_CLASSES}>{ALL_CLASSES}</SelectItem>
                 {classes.map((c) => (
-                  <SelectItem key={c.class.id} value={c.class.name}>
-                    {c.class.name}
+                  <SelectItem key={c.id} value={c.name}>
+                    {c.name}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -112,7 +179,7 @@ export function StudentsPage() {
                 <TableHead>Class</TableHead>
                 <TableHead>Assignments</TableHead>
                 <TableHead>Pending Reviews</TableHead>
-                <TableHead className="text-right">Action</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -144,9 +211,18 @@ export function StudentsPage() {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="sm">
-                      View
-                    </Button>
+                    <div className="flex justify-end gap-1">
+                      <EditStudentDialog
+                        student={s.student}
+                        onUpdate={updateStudent}
+                        classes={classes}
+                        batches={batches}
+                      />
+                      <DeleteStudentDialog
+                        studentName={s.student.name}
+                        onDelete={() => deleteStudent(s.student.id)}
+                      />
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
