@@ -1,103 +1,177 @@
-import { useEffect, useState } from "react"
-import type { Student, Class, Assignment, Submission, Batch } from "@/types"
+import { useEffect, useState, useCallback } from "react"
+import type { Student, Class, Batch, Assignment, Submission } from "@/types"
 
-interface StudentDetails {
-  student: Student
-  className: string
-  batchName: string | null
-  assignmentCount: number
-  assignmentsDone: number
-  pendingCount: number
-}
-
-interface StudentData {
-  students: StudentDetails[]
+interface StudentsData {
+  students: Student[]
+  classes: Class[]
+  batches: Batch[]
+  assignments: Assignment[]
+  submissions: Submission[]
   loading: boolean
   error: string | null
+  refresh: () => void
+  createStudent: (data: {
+    name: string
+    email: string
+    classId: string
+    batchId?: string | null
+  }) => Promise<void>
+  updateStudent: (
+    id: string,
+    data: {
+      name?: string
+      email?: string
+      classId?: string
+      batchId?: string | null
+    }
+  ) => Promise<void>
+  deleteStudent: (id: string) => Promise<void>
 }
 
-export function useStudents(): StudentData {
-  const [students, setStudents] = useState<StudentDetails[]>([])
+export function useStudents(): StudentsData {
+  const [students, setStudents] = useState<Student[]>([])
+  const [classes, setClasses] = useState<Class[]>([])
+  const [batches, setBatches] = useState<Batch[]>([])
+  const [assignments, setAssignments] = useState<Assignment[]>([])
+  const [submissions, setSubmissions] = useState<Submission[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    async function fetchStudentsData() {
-      try {
-        const apiUrl = import.meta.env.VITE_API_BASE_URL
-        const [
-          studentsRes,
-          classesRes,
-          assignmentsRes,
-          submissionsRes,
-          batchesRes,
-        ] = await Promise.all([
-          fetch(`${apiUrl}/students`),
-          fetch(`${apiUrl}/classes`),
-          fetch(`${apiUrl}/assignments`),
-          fetch(`${apiUrl}/submissions`),
-          fetch(`${apiUrl}/batches`),
-        ])
+  const fetchStudentData = useCallback(async () => {
+    try {
+      setLoading(true)
+      const apiUrl = import.meta.env.VITE_API_BASE_URL
+      const [
+        studentsRes,
+        classesRes,
+        batchesRes,
+        assignmentsRes,
+        submissionsRes,
+      ] = await Promise.all([
+        fetch(`${apiUrl}/students`),
+        fetch(`${apiUrl}/classes`),
+        fetch(`${apiUrl}/batches`),
+        fetch(`${apiUrl}/assignments`),
+        fetch(`${apiUrl}/submissions`),
+      ])
 
-        if (
-          !studentsRes.ok ||
-          !classesRes.ok ||
-          !assignmentsRes.ok ||
-          !submissionsRes.ok ||
-          !batchesRes.ok
-        ) {
-          throw new Error("Failed to fetch student data")
-        }
-
-        const students: Student[] = await studentsRes.json()
-        const classes: Class[] = await classesRes.json()
-        const assignments: Assignment[] = await assignmentsRes.json()
-        const submissions: Submission[] = await submissionsRes.json()
-        const batches: Batch[] = await batchesRes.json()
-
-        const enrichedStudents: StudentDetails[] = students.map((s) => {
-          // Get class name
-          const studentClass = classes.find((c) => c.id === s.classId)
-          const className = studentClass?.name || "Unknown"
-
-          // Get batch name if exists
-          const studentBatch = batches.find((b) => b.id === s.batchId)
-          const batchName = studentBatch?.name || null
-
-          // Count assignments
-          const assignmentCount = assignments.filter((a) =>
-            a.batchId ? a.batchId === s.batchId : a.classId === s.classId
-          ).length
-
-          const assignmentsDone = submissions.filter(
-            (sub) => sub.studentId === s.id
-          ).length
-
-          // Count pending submissions
-          const pendingCount = submissions.filter(
-            (sub) => sub.studentId === s.id && sub.status !== "graded"
-          ).length
-
-          return {
-            student: s,
-            className,
-            batchName,
-            assignmentCount,
-            assignmentsDone,
-            pendingCount,
-          }
-        })
-
-        setStudents(enrichedStudents)
-        setLoading(false)
-      } catch (error) {
-        setError(error instanceof Error ? error.message : "An error occurred")
-        setLoading(false)
+      if (
+        !studentsRes.ok ||
+        !classesRes.ok ||
+        !batchesRes.ok ||
+        !assignmentsRes.ok ||
+        !submissionsRes.ok
+      ) {
+        throw new Error("Failed to fetch student data")
       }
-    }
 
-    fetchStudentsData()
+      const [
+        studentsData,
+        classesData,
+        batchesData,
+        assignmentsData,
+        submissionsData,
+      ] = await Promise.all([
+        studentsRes.json(),
+        classesRes.json(),
+        batchesRes.json(),
+        assignmentsRes.json(),
+        submissionsRes.json(),
+      ])
+
+      setStudents(studentsData)
+      setClasses(classesData)
+      setBatches(batchesData)
+      setAssignments(assignmentsData)
+      setSubmissions(submissionsData)
+      setError(null)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred")
+    } finally {
+      setLoading(false)
+    }
   }, [])
 
-  return { students, loading, error }
+  const createStudent = useCallback(
+    async (data: {
+      name: string
+      email: string
+      classId: string
+      batchId?: string | null
+    }) => {
+      const apiUrl = import.meta.env.VITE_API_BASE_URL
+      const response = await fetch(`${apiUrl}/students`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to create student")
+      }
+
+      await fetchStudentData()
+    },
+    [fetchStudentData]
+  )
+
+  const updateStudent = useCallback(
+    async (
+      id: string,
+      data: {
+        name?: string
+        email?: string
+        classId?: string
+        batchId?: string | null
+      }
+    ) => {
+      const apiUrl = import.meta.env.VITE_API_BASE_URL
+      const response = await fetch(`${apiUrl}/students/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to update student")
+      }
+
+      await fetchStudentData()
+    },
+    [fetchStudentData]
+  )
+
+  const deleteStudent = useCallback(
+    async (id: string) => {
+      const apiUrl = import.meta.env.VITE_API_BASE_URL
+      const response = await fetch(`${apiUrl}/students/${id}`, {
+        method: "DELETE",
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to delete student")
+      }
+
+      await fetchStudentData()
+    },
+    [fetchStudentData]
+  )
+
+  useEffect(() => {
+    fetchStudentData()
+  }, [fetchStudentData])
+
+  return {
+    students,
+    classes,
+    batches,
+    assignments,
+    submissions,
+    loading,
+    error,
+    refresh: fetchStudentData,
+    createStudent,
+    updateStudent,
+    deleteStudent,
+  }
 }
