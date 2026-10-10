@@ -1,87 +1,132 @@
-import { useEffect, useState } from "react"
-import type { Submission, Student, Assignment, Class } from "@/types"
-
-export interface EnrichedSubmission {
-  id: string
-  studentName: string
-  studentEmail: string
-  assignmentTitle: string
-  className: string
-  status: "pending" | "submitted" | "graded"
-  submittedAt: string | null
-  grade: string | null
-  studentPdfUrl: string | null
-}
+import { useEffect, useState, useCallback } from "react"
+import type { Submission, Assignment, Student, Class, Batch } from "@/types"
 
 interface SubmissionsData {
-  submissions: EnrichedSubmission[]
+  submissions: Submission[]
+  assignments: Assignment[]
+  students: Student[]
+  classes: Class[]
+  batches: Batch[]
   loading: boolean
   error: string | null
+  refresh: () => void
+  gradeSubmission: (
+    id: string,
+    data: {
+      grade?: string | null
+      feedback?: string | null
+      teacherPdfUrl?: string | null
+      status?: "submitted" | "graded"
+    }
+  ) => Promise<void>
 }
 
 export function useSubmissions(): SubmissionsData {
-  const [submissions, setSubmissions] = useState<EnrichedSubmission[]>([])
+  const [submissions, setSubmissions] = useState<Submission[]>([])
+  const [assignments, setAssignments] = useState<Assignment[]>([])
+  const [students, setStudents] = useState<Student[]>([])
+  const [classes, setClasses] = useState<Class[]>([])
+  const [batches, setBatches] = useState<Batch[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    async function fetchSubmissionsData() {
-      try {
-        const apiUrl = import.meta.env.VITE_API_BASE_URL
-        const [submissionsRes, studentsRes, assignmentsRes, classesRes] =
-          await Promise.all([
-            fetch(`${apiUrl}/submissions`),
-            fetch(`${apiUrl}/students`),
-            fetch(`${apiUrl}/assignments`),
-            fetch(`${apiUrl}/classes`),
-          ])
+  const fetchSubmissionData = useCallback(async () => {
+    try {
+      setLoading(true)
+      const apiUrl = import.meta.env.VITE_API_BASE_URL
+      const [
+        submissionsRes,
+        assignmentsRes,
+        studentsRes,
+        classesRes,
+        batchesRes,
+      ] = await Promise.all([
+        fetch(`${apiUrl}/submissions`),
+        fetch(`${apiUrl}/assignments`),
+        fetch(`${apiUrl}/students`),
+        fetch(`${apiUrl}/classes`),
+        fetch(`${apiUrl}/batches`),
+      ])
 
-        if (
-          !submissionsRes.ok ||
-          !studentsRes.ok ||
-          !assignmentsRes.ok ||
-          !classesRes.ok
-        ) {
-          throw new Error("Failed to fetch submissions data")
-        }
-
-        const submissions: Submission[] = await submissionsRes.json()
-        const students: Student[] = await studentsRes.json()
-        const assignments: Assignment[] = await assignmentsRes.json()
-        const classes: Class[] = await classesRes.json()
-
-        const enrichedSubmissions: EnrichedSubmission[] = submissions.map(
-          (s) => {
-            const student = students.find(
-              (student) => student.id === s.studentId
-            )
-            const assignment = assignments.find((a) => a.id === s.assignmentId)
-            const classInfo = classes.find((c) => c.id === assignment?.classId)
-
-            return {
-              id: s.id,
-              studentName: student?.name || "Unknown",
-              studentEmail: student?.email || "Unknown",
-              assignmentTitle: assignment?.title || "Unknown",
-              className: classInfo?.name || "Unknown",
-              status: s.status,
-              submittedAt: s.submittedAt,
-              grade: s.grade,
-              studentPdfUrl: s.studentPdfUrl,
-            }
-          }
-        )
-
-        setSubmissions(enrichedSubmissions)
-        setLoading(false)
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred")
-        setLoading(false)
+      if (
+        !submissionsRes.ok ||
+        !assignmentsRes.ok ||
+        !studentsRes.ok ||
+        !classesRes.ok ||
+        !batchesRes.ok
+      ) {
+        throw new Error("Failed to fetch submission data")
       }
-    }
 
-    fetchSubmissionsData()
+      const [
+        submissionsData,
+        assignmentsData,
+        studentsData,
+        classesData,
+        batchesData,
+      ] = await Promise.all([
+        submissionsRes.json(),
+        assignmentsRes.json(),
+        studentsRes.json(),
+        classesRes.json(),
+        batchesRes.json(),
+      ])
+
+      setSubmissions(submissionsData)
+      setAssignments(assignmentsData)
+      setStudents(studentsData)
+      setClasses(classesData)
+      setBatches(batchesData)
+      setError(null)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred")
+    } finally {
+      setLoading(false)
+    }
   }, [])
 
-  return { submissions, loading, error }
+  const gradeSubmission = useCallback(
+    async (
+      id: string,
+      data: {
+        grade?: string | null
+        feedback?: string | null
+        teacherPdfUrl?: string | null
+        status?: "submitted" | "graded"
+      }
+    ) => {
+      const apiUrl = import.meta.env.VITE_API_BASE_URL
+      const response = await fetch(`${apiUrl}/submissions/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...data,
+          gradedAt: new Date().toISOString().split("T")[0],
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to grade submission")
+      }
+
+      await fetchSubmissionData()
+    },
+    [fetchSubmissionData]
+  )
+
+  useEffect(() => {
+    fetchSubmissionData()
+  }, [fetchSubmissionData])
+
+  return {
+    submissions,
+    assignments,
+    students,
+    classes,
+    batches,
+    loading,
+    error,
+    refresh: fetchSubmissionData,
+    gradeSubmission,
+  }
 }
