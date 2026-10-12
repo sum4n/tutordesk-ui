@@ -9,6 +9,7 @@ import { SubmissionsPage } from "@/pages/submissions/SubmissionsPage"
 import { SubjectsPage } from "@/pages/subjects/SubjectsPage"
 import { pageMeta } from "@/config/appConfig"
 import type { PageKey } from "@/types"
+import { FilterProvider } from "@/context/FilterContext"
 
 export default function App() {
   const location = useLocation()
@@ -18,23 +19,25 @@ export default function App() {
   const meta = pageMeta[currentPage as PageKey] || pageMeta.dashboard
 
   return (
-    <div className="flex h-screen bg-background text-foreground">
-      <Sidebar />
-      <div className="flex min-w-0 flex-1 flex-col">
-        <TopBar title={meta.title} subtitle={meta.subtitle} />
+    <FilterProvider>
+      <div className="flex h-screen bg-background text-foreground">
+        <Sidebar />
+        <div className="flex min-w-0 flex-1 flex-col">
+          <TopBar title={meta.title} subtitle={meta.subtitle} />
 
-        <main className="flex-1 overflow-auto">
-          <Routes>
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/classes" element={<ClassesPage />} />
-            <Route path="/students" element={<StudentsPage />} />
-            <Route path="/assignments" element={<AssignmentsPage />} />
-            <Route path="/submissions" element={<SubmissionsPage />} />
-            <Route path="/subjects" element={<SubjectsPage />} />
-          </Routes>
-        </main>
+          <main className="flex-1 overflow-auto">
+            <Routes>
+              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/classes" element={<ClassesPage />} />
+              <Route path="/students" element={<StudentsPage />} />
+              <Route path="/assignments" element={<AssignmentsPage />} />
+              <Route path="/submissions" element={<SubmissionsPage />} />
+              <Route path="/subjects" element={<SubjectsPage />} />
+            </Routes>
+          </main>
+        </div>
       </div>
-    </div>
+    </FilterProvider>
   )
 }
