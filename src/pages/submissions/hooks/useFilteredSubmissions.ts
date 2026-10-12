@@ -1,10 +1,20 @@
 import { useMemo } from "react"
 import type { Submission, Assignment, Student, Class, Batch } from "@/types"
 
-export const ALL_ASSIGNMENTS = "All Assignments"
-export const ALL_CLASSES = "All Classes"
-export const ALL_STUDENTS = "All Students"
-export const ALL_STATUSES = "All Statuses"
+interface FilterState {
+  classId: string | null
+  batchId: string | null
+  subjectId: string | null
+}
+
+interface UseFilteredSubmissionsProps {
+  submissions: Submission[]
+  assignments: Assignment[]
+  students: Student[]
+  classes: Class[]
+  batches: Batch[]
+  filters: FilterState
+}
 
 export interface EnrichedSubmission {
   submission: Submission
@@ -15,69 +25,44 @@ export interface EnrichedSubmission {
   batchName: string | null
 }
 
-interface UseFilteredSubmissionsProps {
-  submissions: Submission[]
-  assignments: Assignment[]
-  students: Student[]
-  classes: Class[]
-  batches: Batch[]
-  selectedAssignment: string
-  selectedClass: string
-  selectedStudent: string
-  selectedStatus: string
-}
-
 export function useFilteredSubmissions({
   submissions,
   assignments,
   students,
   classes,
   batches,
-  selectedAssignment,
-  selectedClass,
-  selectedStudent,
-  selectedStatus,
+  filters,
 }: UseFilteredSubmissionsProps) {
   const filteredSubmissions = useMemo(() => {
     let filtered = submissions
 
-    // Filter by assignment
-    if (selectedAssignment !== ALL_ASSIGNMENTS) {
-      const selectedAssignmentObj = assignments.find(
-        (a) => a.title === selectedAssignment
+    // Filter by class (through student)
+    if (filters.classId) {
+      const classStudentIds = students
+        .filter((s) => s.classId === filters.classId)
+        .map((s) => s.id)
+      filtered = filtered.filter((sub) =>
+        classStudentIds.includes(sub.studentId)
       )
-      if (selectedAssignmentObj) {
-        filtered = filtered.filter(
-          (s) => s.assignmentId === selectedAssignmentObj.id
-        )
-      }
     }
 
-    // Filter by class
-    if (selectedClass !== ALL_CLASSES) {
-      const selectedClassObj = classes.find((c) => c.name === selectedClass)
-      if (selectedClassObj) {
-        const classStudentIds = students
-          .filter((s) => s.classId === selectedClassObj.id)
-          .map((s) => s.id)
-        filtered = filtered.filter((s) => classStudentIds.includes(s.studentId))
-      }
-    }
-
-    // Filter by student
-    if (selectedStudent !== ALL_STUDENTS) {
-      const selectedStudentObj = students.find(
-        (s) => s.name === selectedStudent
+    // Filter by batch (through student)
+    if (filters.batchId) {
+      const batchStudentIds = students
+        .filter((s) => s.batchId === filters.batchId)
+        .map((s) => s.id)
+      filtered = filtered.filter((sub) =>
+        batchStudentIds.includes(sub.studentId)
       )
-      if (selectedStudentObj) {
-        filtered = filtered.filter((s) => s.studentId === selectedStudentObj.id)
-      }
     }
 
-    // Filter by status
-    if (selectedStatus !== ALL_STATUSES) {
-      filtered = filtered.filter(
-        (s) => s.status === selectedStatus.toLowerCase()
+    // Filter by subject (through assignment)
+    if (filters.subjectId) {
+      const subjectAssignmentIds = assignments
+        .filter((a) => a.subjectId === filters.subjectId)
+        .map((a) => a.id)
+      filtered = filtered.filter((sub) =>
+        subjectAssignmentIds.includes(sub.assignmentId)
       )
     }
 
@@ -101,17 +86,7 @@ export function useFilteredSubmissions({
     })
 
     return enriched
-  }, [
-    submissions,
-    assignments,
-    students,
-    classes,
-    batches,
-    selectedAssignment,
-    selectedClass,
-    selectedStudent,
-    selectedStatus,
-  ])
+  }, [submissions, assignments, students, classes, batches, filters])
 
   return { filteredSubmissions }
 }

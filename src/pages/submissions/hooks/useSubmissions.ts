@@ -1,5 +1,12 @@
 import { useEffect, useState, useCallback } from "react"
-import type { Submission, Assignment, Student, Class, Batch } from "@/types"
+import type {
+  Submission,
+  Assignment,
+  Student,
+  Class,
+  Batch,
+  Subject,
+} from "@/types"
 
 interface SubmissionsData {
   submissions: Submission[]
@@ -7,6 +14,7 @@ interface SubmissionsData {
   students: Student[]
   classes: Class[]
   batches: Batch[]
+  subjects: Subject[]
   loading: boolean
   error: string | null
   refresh: () => void
@@ -27,6 +35,7 @@ export function useSubmissions(): SubmissionsData {
   const [students, setStudents] = useState<Student[]>([])
   const [classes, setClasses] = useState<Class[]>([])
   const [batches, setBatches] = useState<Batch[]>([])
+  const [subjects, setSubjects] = useState<Subject[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -40,12 +49,14 @@ export function useSubmissions(): SubmissionsData {
         studentsRes,
         classesRes,
         batchesRes,
+        subjectsRes,
       ] = await Promise.all([
         fetch(`${apiUrl}/submissions`),
         fetch(`${apiUrl}/assignments`),
         fetch(`${apiUrl}/students`),
         fetch(`${apiUrl}/classes`),
         fetch(`${apiUrl}/batches`),
+        fetch(`${apiUrl}/subjects`),
       ])
 
       if (
@@ -53,7 +64,8 @@ export function useSubmissions(): SubmissionsData {
         !assignmentsRes.ok ||
         !studentsRes.ok ||
         !classesRes.ok ||
-        !batchesRes.ok
+        !batchesRes.ok ||
+        !subjectsRes.ok
       ) {
         throw new Error("Failed to fetch submission data")
       }
@@ -64,12 +76,14 @@ export function useSubmissions(): SubmissionsData {
         studentsData,
         classesData,
         batchesData,
+        subjectsData,
       ] = await Promise.all([
         submissionsRes.json(),
         assignmentsRes.json(),
         studentsRes.json(),
         classesRes.json(),
         batchesRes.json(),
+        subjectsRes.json(),
       ])
 
       setSubmissions(submissionsData)
@@ -77,6 +91,7 @@ export function useSubmissions(): SubmissionsData {
       setStudents(studentsData)
       setClasses(classesData)
       setBatches(batchesData)
+      setSubjects(subjectsData)
       setError(null)
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred")
@@ -124,6 +139,7 @@ export function useSubmissions(): SubmissionsData {
     students,
     classes,
     batches,
+    subjects,
     loading,
     error,
     refresh: fetchSubmissionData,
