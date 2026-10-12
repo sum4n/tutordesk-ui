@@ -1,39 +1,36 @@
 import { useEffect, useState, useCallback } from "react"
-import type {
-  Assignment,
-  Submission,
-  Class,
-  Student,
-  Batch,
-  Subject,
-} from "@/types"
+import type { Assignment, Class, Batch, Subject, Submission } from "@/types"
 
-export interface EnrichedAssignment {
-  assignment: Assignment
-  className: string
-  batchName: string | null
-  numberOfStudentsWithAssignments: number
-  numberOfAssignmentsSubmitted: number
-  status: "Active" | "Completed"
-}
-
-interface AssignmentData {
-  assignments: EnrichedAssignment[]
-  loading: boolean
-  error: string | null
-  refresh: () => void
+interface AssignmentsData {
+  assignments: Assignment[]
   classes: Class[]
   batches: Batch[]
   subjects: Subject[]
-  updateAssignment: (id: string, data: Partial<Assignment>) => Promise<void>
+  submissions: Submission[]
+  loading: boolean
+  error: string | null
+  refresh: () => void
+  updateAssignment: (
+    id: string,
+    data: {
+      title?: string
+      description?: string
+      pdfUrl?: string
+      classId?: string
+      batchId?: string | null
+      subjectId?: string
+      dueDate?: string
+    }
+  ) => Promise<void>
   deleteAssignment: (id: string) => Promise<void>
 }
 
-export function useAssignments(): AssignmentData {
-  const [assignments, setAssignments] = useState<EnrichedAssignment[]>([])
+export function useAssignments(): AssignmentsData {
+  const [assignments, setAssignments] = useState<Assignment[]>([])
   const [classes, setClasses] = useState<Class[]>([])
   const [batches, setBatches] = useState<Batch[]>([])
   const [subjects, setSubjects] = useState<Subject[]>([])
+  const [submissions, setSubmissions] = useState<Submission[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -45,76 +42,45 @@ export function useAssignments(): AssignmentData {
         assignmentsRes,
         classesRes,
         batchesRes,
-        studentsRes,
-        submissionsRes,
         subjectsRes,
+        submissionsRes,
       ] = await Promise.all([
         fetch(`${apiUrl}/assignments`),
         fetch(`${apiUrl}/classes`),
         fetch(`${apiUrl}/batches`),
-        fetch(`${apiUrl}/students`),
-        fetch(`${apiUrl}/submissions`),
         fetch(`${apiUrl}/subjects`),
+        fetch(`${apiUrl}/submissions`),
       ])
 
       if (
         !assignmentsRes.ok ||
         !classesRes.ok ||
         !batchesRes.ok ||
-        !studentsRes.ok ||
-        !submissionsRes.ok ||
-        !subjectsRes.ok
+        !subjectsRes.ok ||
+        !submissionsRes.ok
       ) {
         throw new Error("Failed to fetch assignment data")
       }
 
-      const assignmentsData: Assignment[] = await assignmentsRes.json()
-      const classesData: Class[] = await classesRes.json()
-      const batchesData: Batch[] = await batchesRes.json()
-      const students: Student[] = await studentsRes.json()
-      const submissions: Submission[] = await submissionsRes.json()
-      const subjectsData: Subject[] = await subjectsRes.json()
+      const [
+        assignmentsData,
+        classesData,
+        batchesData,
+        subjectsData,
+        submissionsData,
+      ] = await Promise.all([
+        assignmentsRes.json(),
+        classesRes.json(),
+        batchesRes.json(),
+        subjectsRes.json(),
+        submissionsRes.json(),
+      ])
 
-      const enrichedAssignments: EnrichedAssignment[] = assignmentsData.map(
-        (a) => {
-          const assignmentClass = classesData.find((c) => c.id === a.classId)
-          const className = assignmentClass?.name || "Unknown"
-
-          const assignmentBatch = batchesData.find((b) => b.id === a.batchId)
-          const batchName = assignmentBatch?.name || null
-
-          const numberOfStudentsWithAssignments = students.filter((s) => {
-            if (a.batchId) {
-              return s.classId === a.classId && s.batchId === a.batchId
-            }
-            return s.classId === a.classId
-          }).length
-
-          const numberOfAssignmentsSubmitted = submissions.filter(
-            (s) => s.assignmentId === a.id
-          ).length
-
-          const today = new Date()
-          today.setHours(0, 0, 0, 0)
-          const dueDate = new Date(a.dueDate)
-          dueDate.setHours(0, 0, 0, 0)
-          const status = dueDate < today ? "Completed" : "Active"
-
-          return {
-            assignment: a,
-            className,
-            batchName,
-            numberOfStudentsWithAssignments,
-            numberOfAssignmentsSubmitted,
-            status,
-          }
-        }
-      )
-
-      setAssignments(enrichedAssignments)
+      setAssignments(assignmentsData)
       setClasses(classesData)
       setBatches(batchesData)
       setSubjects(subjectsData)
+      setSubmissions(submissionsData)
       setError(null)
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred")
@@ -124,10 +90,21 @@ export function useAssignments(): AssignmentData {
   }, [])
 
   const updateAssignment = useCallback(
-    async (id: string, data: Partial<Assignment>) => {
+    async (
+      id: string,
+      data: {
+        title?: string
+        description?: string
+        pdfUrl?: string
+        classId?: string
+        batchId?: string | null
+        subjectId?: string
+        dueDate?: string
+      }
+    ) => {
       const apiUrl = import.meta.env.VITE_API_BASE_URL
       const response = await fetch(`${apiUrl}/assignments/${id}`, {
-        method: "PUT",
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       })
@@ -163,12 +140,13 @@ export function useAssignments(): AssignmentData {
 
   return {
     assignments,
-    loading,
-    error,
-    refresh: fetchAssignmentData,
     classes,
     batches,
     subjects,
+    submissions,
+    loading,
+    error,
+    refresh: fetchAssignmentData,
     updateAssignment,
     deleteAssignment,
   }

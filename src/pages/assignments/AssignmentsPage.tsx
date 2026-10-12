@@ -1,10 +1,13 @@
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import { useAssignments } from "@/pages/assignments/hooks/useAssignments"
-import { AssignmentsTable } from "@/pages/assignments/components/AssignmentsTable"
-import { CreateAssignmentDialog } from "@/pages/assignments/components/CreateAssignmentDialog"
+import { useAssignments } from "./hooks/useAssignments"
+import { useFilteredAssignments } from "./hooks/useFilteredAssignments"
+import { CreateAssignmentDialog } from "./components/CreateAssignmentDialog"
+import { AssignmentsTable } from "./components/AssignmentsTable"
+import { FilterBar } from "@/components/FilterBar"
+import { useFilter } from "@/context/FilterContext"
 import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { FileText } from "lucide-react"
+import { Button } from "@/components/ui/button"
 import { Link } from "react-router"
 
 export function AssignmentsPage() {
@@ -16,22 +19,34 @@ export function AssignmentsPage() {
     classes,
     batches,
     subjects,
+    submissions,
     updateAssignment,
     deleteAssignment,
   } = useAssignments()
+
+  const { filters } = useFilter()
+
+  const { filteredAssignments } = useFilteredAssignments({
+    assignments,
+    classes,
+    batches,
+    subjects,
+    submissions,
+    filters,
+  })
+
+  // 1. PUT getStatus HERE (inside the component, before the returns)
+  const getStatus = (dueDate: string) => {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const due = new Date(dueDate)
+    return due >= today ? "Active" : "Completed"
+  }
 
   if (loading) {
     return (
       <div className="flex h-full items-center justify-center">
         <p className="text-muted-foreground">Loading assignments...</p>
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <p className="text-red-500">Error: {error}</p>
       </div>
     )
   }
@@ -90,12 +105,13 @@ export function AssignmentsPage() {
     )
   }
 
-  const totalAssignments = assignments.length
-  const activeAssignments = assignments.filter(
-    (assignment) => assignment.status === "Active"
+  // 2. UPDATE THESE COUNTS TO USE getStatus
+  const totalAssignments = filteredAssignments.length
+  const activeAssignments = filteredAssignments.filter(
+    (a) => getStatus(a.assignment.dueDate) === "Active"
   ).length
-  const completedAssignments = assignments.filter(
-    (assignment) => assignment.status === "Completed"
+  const completedAssignments = filteredAssignments.filter(
+    (a) => getStatus(a.assignment.dueDate) === "Completed"
   ).length
 
   return (
@@ -114,19 +130,26 @@ export function AssignmentsPage() {
           subjects={subjects}
         />
       </div>
-      {assignments.length === 0 ? (
+
+      <FilterBar classes={classes} batches={batches} subjects={subjects} />
+
+      {filteredAssignments.length === 0 ? (
         <Card className="p-12 text-center">
           <FileText className="m-auto h-12 w-12 text-muted-foreground" />
-          <h3 className="mb-2 text-lg font-semibold">No assignments yet</h3>
+          <h3 className="mb-2 text-lg font-semibold">No assignments found</h3>
           <p className="mb-4 text-muted-foreground">
-            Create your first assignment to get started
+            {filters.classId || filters.batchId || filters.subjectId
+              ? "Try adjusting your filters"
+              : "Create your first assignment to get started"}
           </p>
-          <CreateAssignmentDialog
-            onAssignmentCreated={refresh}
-            classes={classes}
-            batches={batches}
-            subjects={subjects}
-          />
+          {!filters.classId && !filters.batchId && !filters.subjectId && (
+            <CreateAssignmentDialog
+              onAssignmentCreated={refresh}
+              classes={classes}
+              batches={batches}
+              subjects={subjects}
+            />
+          )}
         </Card>
       ) : (
         <Tabs defaultValue="all">
@@ -142,7 +165,7 @@ export function AssignmentsPage() {
 
           <TabsContent value="all" className="mt-4">
             <AssignmentsTable
-              assignments={assignments}
+              assignments={filteredAssignments}
               updateAssignment={updateAssignment}
               deleteAssignment={deleteAssignment}
               classes={classes}
@@ -150,9 +173,13 @@ export function AssignmentsPage() {
               subjects={subjects}
             />
           </TabsContent>
+
+          {/* 3. UPDATE THESE TABS CONTENT SECTIONS */}
           <TabsContent value="active" className="mt-4">
             <AssignmentsTable
-              assignments={assignments.filter((a) => a.status === "Active")}
+              assignments={filteredAssignments.filter(
+                (a) => getStatus(a.assignment.dueDate) === "Active"
+              )}
               updateAssignment={updateAssignment}
               deleteAssignment={deleteAssignment}
               classes={classes}
@@ -160,9 +187,12 @@ export function AssignmentsPage() {
               subjects={subjects}
             />
           </TabsContent>
+
           <TabsContent value="completed" className="mt-4">
             <AssignmentsTable
-              assignments={assignments.filter((a) => a.status === "Completed")}
+              assignments={filteredAssignments.filter(
+                (a) => getStatus(a.assignment.dueDate) === "Completed"
+              )}
               updateAssignment={updateAssignment}
               deleteAssignment={deleteAssignment}
               classes={classes}

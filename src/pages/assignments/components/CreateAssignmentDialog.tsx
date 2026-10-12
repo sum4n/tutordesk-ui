@@ -1,4 +1,5 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useFilter } from "@/context/FilterContext"
 import {
   Dialog,
   DialogContent,
@@ -35,41 +36,62 @@ export function CreateAssignmentDialog({
   batches,
   subjects,
 }: CreateAssignmentDialogProps) {
+  const { filters } = useFilter()
+
   const [open, setOpen] = useState(false)
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
   const [pdfUrl, setPdfUrl] = useState("")
+  const [dueDate, setDueDate] = useState("")
   const [className, setClassName] = useState("")
   const [batchName, setBatchName] = useState("none")
   const [subjectName, setSubjectName] = useState("")
-  const [dueDate, setDueDate] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Find the selected class object by name
+  // Pre-fill from context when dialog opens
+  useEffect(() => {
+    if (open) {
+      if (filters.classId) {
+        const selectedClass = classes.find((c) => c.id === filters.classId)
+        if (selectedClass) setClassName(selectedClass.name)
+      }
+      if (filters.batchId) {
+        const selectedBatch = batches.find((b) => b.id === filters.batchId)
+        if (selectedBatch) setBatchName(selectedBatch.name)
+      }
+      if (filters.subjectId) {
+        const selectedSubject = subjects.find((s) => s.id === filters.subjectId)
+        if (selectedSubject) setSubjectName(selectedSubject.name)
+      }
+    }
+  }, [open, filters, classes, batches, subjects])
+
   const selectedClass = classes.find((c) => c.name === className)
-  const selectedClassId = selectedClass?.id || ""
+  const filteredBatches = batches.filter((b) => b.classId === selectedClass?.id)
 
-  // Filter batches by selected class
-  const filteredBatches = batches.filter((b) => b.classId === selectedClassId)
-
-  const handleSubmit = async (event: React.SubmitEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    setLoading(true)
-    setError(null)
-
-    // Convert names back to IDs for the API
-    const classId = classes.find((c) => c.name === className)?.id
-    const batchId = batches.find((b) => b.name === batchName)?.id || null
-    const subjectId = subjects.find((s) => s.name === subjectName)?.id
-
-    if (!classId || !subjectId) {
-      setError("Please select a class and subject")
-      setLoading(false)
+  const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    if (!selectedClass) {
+      setError("Please select a class")
       return
     }
 
+    const selectedSubject = subjects.find((s) => s.name === subjectName)
+    if (!selectedSubject) {
+      setError("Please select a subject")
+      return
+    }
+
+    setLoading(true)
+    setError(null)
+
     try {
+      const batchId =
+        batchName === "none"
+          ? null
+          : batches.find((b) => b.name === batchName)?.id || null
+
       const apiUrl = import.meta.env.VITE_API_BASE_URL
       const response = await fetch(`${apiUrl}/assignments`, {
         method: "POST",
@@ -78,9 +100,9 @@ export function CreateAssignmentDialog({
           title,
           description,
           pdfUrl,
-          classId,
+          classId: selectedClass.id,
           batchId,
-          subjectId,
+          subjectId: selectedSubject.id,
           dueDate,
           createdAt: new Date().toISOString().split("T")[0],
         }),
@@ -93,12 +115,11 @@ export function CreateAssignmentDialog({
       setTitle("")
       setDescription("")
       setPdfUrl("")
+      setDueDate("")
       setClassName("")
       setBatchName("none")
       setSubjectName("")
-      setDueDate("")
       setOpen(false)
-
       onAssignmentCreated()
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred")
@@ -109,20 +130,18 @@ export function CreateAssignmentDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger
-        render={
-          <Button size="sm" className="gap-1.5">
-            <Plus className="h-3.5 w-3.5" />
-            New Assignment
-          </Button>
-        }
-      />
-      <DialogContent className="sm:max-w-125">
+      <DialogTrigger asChild>
+        <Button className="gap-1.5">
+          <Plus className="h-4 w-4" />
+          Create Assignment
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[600px]">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>Create New Assignment</DialogTitle>
             <DialogDescription>
-              Add a new assignment for your students.
+              Upload a PDF assignment for your students.
             </DialogDescription>
           </DialogHeader>
 
@@ -153,16 +172,27 @@ export function CreateAssignmentDialog({
               <Label htmlFor="pdfUrl">PDF URL</Label>
               <Input
                 id="pdfUrl"
-                placeholder="https://example.com/assignment.pdf"
+                placeholder="e.g., assignment.pdf"
                 value={pdfUrl}
                 onChange={(e) => setPdfUrl(e.target.value)}
                 required
               />
             </div>
 
+            <div className="grid gap-2">
+              <Label htmlFor="dueDate">Due Date</Label>
+              <Input
+                id="dueDate"
+                type="date"
+                value={dueDate}
+                onChange={(e) => setDueDate(e.target.value)}
+                required
+              />
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="class">Class</Label>
+                <Label>Class</Label>
                 <Select
                   value={className}
                   onValueChange={(value) => {
@@ -187,7 +217,7 @@ export function CreateAssignmentDialog({
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="batch">Batch (Optional)</Label>
+                <Label>Batch (Optional)</Label>
                 <Select
                   value={batchName}
                   onValueChange={(value) => {
@@ -196,10 +226,10 @@ export function CreateAssignmentDialog({
                   disabled={!className || filteredBatches.length === 0}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="No batch" />
+                    <SelectValue placeholder="All batches" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="none">No batch</SelectItem>
+                    <SelectItem value="none">All batches</SelectItem>
                     {filteredBatches.map((b) => (
                       <SelectItem key={b.id} value={b.name}>
                         {b.name}
@@ -210,39 +240,26 @@ export function CreateAssignmentDialog({
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="subject">Subject</Label>
-                <Select
-                  value={subjectName}
-                  onValueChange={(value) => {
-                    if (value !== null) setSubjectName(value)
-                  }}
-                  required
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select subject" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {subjects.map((s) => (
-                      <SelectItem key={s.id} value={s.name}>
-                        {s.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="grid gap-2">
-                <Label htmlFor="dueDate">Due Date</Label>
-                <Input
-                  id="dueDate"
-                  type="date"
-                  value={dueDate}
-                  onChange={(e) => setDueDate(e.target.value)}
-                  required
-                />
-              </div>
+            <div className="grid gap-2">
+              <Label>Subject</Label>
+              <Select
+                value={subjectName}
+                onValueChange={(value) => {
+                  if (value !== null) setSubjectName(value)
+                }}
+                required
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select subject" />
+                </SelectTrigger>
+                <SelectContent>
+                  {subjects.map((s) => (
+                    <SelectItem key={s.id} value={s.name}>
+                      {s.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             {error && <p className="text-sm text-red-500">{error}</p>}
