@@ -23,7 +23,7 @@ import type { Assignment, Class, Batch, Subject } from "@/types"
 
 interface EditAssignmentDialogProps {
   assignment: Assignment
-  updateAssignment: (id: string, data: Partial<Assignment>) => Promise<void>
+  onUpdate: (id: string, data: Partial<Assignment>) => Promise<void>
   classes: Class[]
   batches: Batch[]
   subjects: Subject[]
@@ -31,7 +31,7 @@ interface EditAssignmentDialogProps {
 
 export function EditAssignmentDialog({
   assignment,
-  updateAssignment,
+  onUpdate,
   classes,
   batches,
   subjects,
@@ -78,7 +78,7 @@ export function EditAssignmentDialog({
     }
 
     try {
-      await updateAssignment(assignment.id, {
+      await onUpdate(assignment.id, {
         title,
         description,
         pdfUrl,
