@@ -1,116 +1,99 @@
 {
   "classes": [
     {
-      "id": "1",
+      "id": "c1",
       "name": "11th",
       "description": "11th grade students"
     },
     {
-      "id": "2",
+      "id": "c2",
       "name": "12th",
       "description": "12th grade students"
     }
   ],
   "batches": [
     {
-      "id": "1",
-      "classId": "1",
+      "id": "b1",
+      "classId": "c1",
       "name": "Batch A",
       "schedule": "Mon/Wed/Fri 4-6 PM"
     },
     {
-      "id": "2",
-      "classId": "1",
+      "id": "b2",
+      "classId": "c1",
       "name": "Batch B",
       "schedule": "Tue/Thu 4-6 PM"
     }
   ],
   "subjects": [
     {
-      "id": "1",
+      "id": "s1",
       "name": "Mathematics"
     },
     {
-      "id": "2",
+      "id": "s2",
       "name": "Physical Science"
-    }
-  ],
-  "classSubjects": [
-    {
-      "id": "1",
-      "classId": "1",
-      "subjectId": "1"
-    },
-    {
-      "id": "2",
-      "classId": "1",
-      "subjectId": "2"
-    },
-    {
-      "id": "3",
-      "classId": "2",
-      "subjectId": "2"
     }
   ],
   "students": [
     {
-      "id": "1",
+      "id": "st1",
       "name": "Aarav Reddy",
       "email": "aarav@email.com",
-      "classId": "1",
-      "batchId": "1"
+      "classId": "c1",
+      "batchId": "b1"
     },
     {
-      "id": "2",
+      "id": "st2",
       "name": "Priya Sharma",
       "email": "priya@email.com",
-      "classId": "1",
-      "batchId": "1"
+      "classId": "c1",
+      "batchId": "b1"
     },
     {
-      "id": "3",
+      "id": "st3",
       "name": "Rohan Kumar",
       "email": "rohan@email.com",
-      "classId": "1",
-      "batchId": "2"
+      "classId": "c1",
+      "batchId": "b2"
     },
     {
-      "id": "4",
+      "id": "st4",
       "name": "Diya Patel",
       "email": "diya@email.com",
-      "classId": "2",
+      "classId": "c2",
       "batchId": null
     }
   ],
   "assignments": [
     {
-      "id": "1",
+      "id": "a1",
       "title": "Quadratic Equations",
       "description": "Solve problems 1-20 from chapter 4",
       "pdfUrl": "quad-eq.pdf",
-      "classId": "1",
+      "classId": "c1",
       "batchId": null,
-      "subjectId": "1",
+      "subjectId": "s1",
       "dueDate": "2026-09-25",
       "createdAt": "2026-09-20"
     },
     {
-      "id": "2",
+      "id": "a2",
       "title": "Laws of Motion",
       "description": "Write notes on Newton's three laws",
       "pdfUrl": "laws-motion.pdf",
-      "classId": "1",
-      "batchId": "1",
-      "subjectId": "2",
+      "classId": "c1",
+      "batchId": "b1",
+      "subjectId": "s2",
       "dueDate": "2026-09-22",
       "createdAt": "2026-09-18"
     }
   ],
   "submissions": [
     {
-      "id": "1",
-      "assignmentId": "1",
-      "studentId": "1",
+      "id": "sub1",
+      "assignmentId": "a1",
+      "studentId": "st1",
       "status": "submitted",
       "studentPdfUrl": "aarav-quad.pdf",
       "submittedAt": "2026-09-22",
@@ -120,9 +103,9 @@
       "feedback": null
     },
     {
-      "id": "2",
-      "assignmentId": "1",
-      "studentId": "2",
+      "id": "sub2",
+      "assignmentId": "a1",
+      "studentId": "st2",
       "status": "graded",
       "studentPdfUrl": "priya-quad.pdf",
       "submittedAt": "2026-09-21",

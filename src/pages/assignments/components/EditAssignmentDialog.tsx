@@ -19,24 +19,22 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Pencil } from "lucide-react"
-import type { Assignment, Class, Batch, Subject, ClassSubject } from "@/types"
+import type { Assignment, Class, Batch, Subject } from "@/types"
 
 interface EditAssignmentDialogProps {
   assignment: Assignment
-  updateAssignment: (id: string, data: Partial<Assignment>) => Promise<void>
+  onUpdate: (id: string, data: Partial<Assignment>) => Promise<void>
   classes: Class[]
   batches: Batch[]
   subjects: Subject[]
-  classSubjects: ClassSubject[]
 }
 
 export function EditAssignmentDialog({
   assignment,
-  updateAssignment,
+  onUpdate,
   classes,
   batches,
   subjects,
-  classSubjects,
 }: EditAssignmentDialogProps) {
   const [open, setOpen] = useState(false)
   const [title, setTitle] = useState(assignment.title)
@@ -63,13 +61,6 @@ export function EditAssignmentDialog({
   // Filter batches by selected class
   const filteredBatches = batches.filter((b) => b.classId === selectedClassId)
 
-  // Filter subjects by selected class
-  const filteredSubjects = subjects.filter((s) =>
-    classSubjects.some(
-      (cs) => cs.classId === selectedClassId && cs.subjectId === s.id
-    )
-  )
-
   const handleSubmit = async (event: React.SubmitEvent<HTMLFormElement>) => {
     event.preventDefault()
     setLoading(true)
@@ -87,7 +78,7 @@ export function EditAssignmentDialog({
     }
 
     try {
-      await updateAssignment(assignment.id, {
+      await onUpdate(assignment.id, {
         title,
         description,
         pdfUrl,
@@ -164,7 +155,6 @@ export function EditAssignmentDialog({
                     if (value !== null) {
                       setClassName(value)
                       setBatchName("none")
-                      setSubjectName("")
                     }
                   }}
                   required
@@ -214,14 +204,14 @@ export function EditAssignmentDialog({
                   onValueChange={(value) => {
                     if (value !== null) setSubjectName(value)
                   }}
-                  disabled={!className || filteredSubjects.length === 0}
+                  disabled={!className || subjects.length === 0}
                   required
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select subject" />
                   </SelectTrigger>
                   <SelectContent>
-                    {filteredSubjects.map((s) => (
+                    {subjects.map((s) => (
                       <SelectItem key={s.id} value={s.name}>
                         {s.name}
                       </SelectItem>

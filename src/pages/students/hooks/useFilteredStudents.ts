@@ -1,9 +1,9 @@
 import { useMemo } from "react"
-import type { Student } from "@/types"
+import type { Student, Class, Batch, Assignment, Submission } from "@/types"
 
 export const ALL_CLASSES = "All Classes"
 
-interface StudentDetails {
+export interface EnrichedStudent {
   student: Student
   className: string
   batchName: string | null
@@ -13,35 +13,88 @@ interface StudentDetails {
 }
 
 interface UseFilteredStudentsProps {
-  students: StudentDetails[]
+  students: Student[]
+  classes: Class[]
+  batches: Batch[]
+  assignments: Assignment[]
+  submissions: Submission[]
   selectedClass: string
   searchQuery: string
 }
 
 export function useFilteredStudents({
   students,
+  classes,
+  batches,
+  assignments,
+  submissions,
   selectedClass,
   searchQuery,
 }: UseFilteredStudentsProps) {
-  const filteredStudents = useMemo(() => {
-    if (selectedClass === ALL_CLASSES) {
-      return students
-    }
-    return students.filter((s) => s.className === selectedClass)
-  }, [students, selectedClass])
-
   const searchedStudents = useMemo(() => {
-    if (searchQuery.length === 0) {
-      return filteredStudents
+    let filtered = students
+
+    // Filter by class
+    if (selectedClass !== ALL_CLASSES) {
+      const selectedClassObj = classes.find((c) => c.name === selectedClass)
+      if (selectedClassObj) {
+        filtered = filtered.filter((s) => s.classId === selectedClassObj.id)
+      }
     }
-    const query = searchQuery.toLowerCase()
-    return filteredStudents.filter((s) => {
-      return (
-        s.student.name.toLowerCase().includes(query) ||
-        s.student.email.toLowerCase().includes(query)
+
+    // Filter by search query
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase()
+      filtered = filtered.filter(
+        (s) =>
+          s.name.toLowerCase().includes(query) ||
+          s.email.toLowerCase().includes(query)
       )
+    }
+
+    // Enrich with class/batch names and assignment stats
+    const enriched: EnrichedStudent[] = filtered.map((student) => {
+      const studentClass = classes.find((c) => c.id === student.classId)
+      const className = studentClass?.name || "Unknown"
+
+      const studentBatch = batches.find((b) => b.id === student.batchId)
+      const batchName = studentBatch?.name || null
+
+      // Count assignments for this student's class
+      const classAssignments = assignments.filter(
+        (a) => a.classId === student.classId
+      )
+      const assignmentCount = classAssignments.length
+
+      // Count submissions for this student
+      const studentSubmissions = submissions.filter(
+        (s) => s.studentId === student.id
+      )
+      const assignmentsDone = studentSubmissions.filter(
+        (s) => s.status === "submitted" || s.status === "graded"
+      ).length
+      const pendingCount = assignmentCount - assignmentsDone
+
+      return {
+        student,
+        className,
+        batchName,
+        assignmentCount,
+        assignmentsDone,
+        pendingCount,
+      }
     })
-  }, [filteredStudents, searchQuery])
+
+    return enriched
+  }, [
+    students,
+    classes,
+    batches,
+    assignments,
+    submissions,
+    selectedClass,
+    searchQuery,
+  ])
 
   return { searchedStudents }
 }

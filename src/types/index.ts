@@ -42,12 +42,6 @@ export interface Subject {
   description: string | null
 }
 
-export interface ClassSubject {
-  id: string
-  classId: string
-  subjectId: string
-}
-
 export interface Student {
   id: string
   name: string

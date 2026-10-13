@@ -1,5 +1,5 @@
-import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import {
   Table,
   TableBody,
@@ -9,19 +9,29 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { FileText } from "lucide-react"
-import type { EnrichedAssignment } from "@/pages/assignments/hooks/useAssignments"
-import type { Assignment, Class, Batch, Subject, ClassSubject } from "@/types"
-import { EditAssignmentDialog } from "@/pages/assignments/components/EditAssignmentDialog"
-import { DeleteAssignmentDialog } from "@/pages/assignments/components/DeleteAssignmentDialog"
+import { EditAssignmentDialog } from "./EditAssignmentDialog"
+import { DeleteAssignmentDialog } from "./DeleteAssignmentDialog"
+import type { Class, Batch, Subject } from "@/types"
+import type { EnrichedAssignment } from "../hooks/useFilteredAssignments"
 
-interface AssignmentTableProps {
+interface AssignmentsTableProps {
   assignments: EnrichedAssignment[]
-  updateAssignment: (id: string, data: Partial<Assignment>) => Promise<void>
+  updateAssignment: (
+    id: string,
+    data: {
+      title?: string
+      description?: string
+      pdfUrl?: string
+      classId?: string
+      batchId?: string | null
+      subjectId?: string
+      dueDate?: string
+    }
+  ) => Promise<void>
   deleteAssignment: (id: string) => Promise<void>
   classes: Class[]
   batches: Batch[]
   subjects: Subject[]
-  classSubjects: ClassSubject[]
 }
 
 export function AssignmentsTable({
@@ -31,87 +41,104 @@ export function AssignmentsTable({
   classes,
   batches,
   subjects,
-  classSubjects,
-}: AssignmentTableProps) {
+}: AssignmentsTableProps) {
+  const getStatus = (dueDate: string) => {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const due = new Date(dueDate)
+    return due >= today ? "Active" : "Completed"
+  }
+
   return (
-    <Card>
-      <CardContent className="p-0">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Title</TableHead>
-              <TableHead>Class</TableHead>
-              <TableHead>Due Date</TableHead>
-              <TableHead>Submissions</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Action</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {assignments.map((a) => (
-              <TableRow key={a.assignment.id}>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <FileText className="h-4 w-4 text-red-500" />
-                    <div>
-                      <div className="font-medium">{a.assignment.title}</div>
-                      <div className="text-xs text-muted-foreground">
-                        {a.assignment.pdfUrl}
-                      </div>
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Title</TableHead>
+          <TableHead>Subject</TableHead>
+          <TableHead>Class</TableHead>
+          <TableHead>Due Date</TableHead>
+          <TableHead>Status</TableHead>
+          <TableHead>Submissions</TableHead>
+          <TableHead className="text-right">Actions</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {assignments.map((enriched) => {
+          const {
+            assignment,
+            className,
+            batchName,
+            subjectName,
+            submissionCount,
+            gradedCount,
+          } = enriched
+          const status = getStatus(assignment.dueDate)
+
+          return (
+            <TableRow key={assignment.id}>
+              <TableCell>
+                <div>
+                  <div className="font-medium">{assignment.title}</div>
+                  {assignment.description && (
+                    <div className="line-clamp-1 text-xs text-muted-foreground">
+                      {assignment.description}
                     </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Badge variant="secondary">
-                    {a.batchName
-                      ? `${a.className} - ${a.batchName}`
-                      : a.className}
-                  </Badge>
-                </TableCell>
-                <TableCell>{a.assignment.dueDate}</TableCell>
-                <TableCell>
-                  <span className="font-semibold">
-                    {a.numberOfAssignmentsSubmitted}
-                  </span>
+                  )}
+                </div>
+              </TableCell>
+              <TableCell>
+                <Badge variant="secondary">{subjectName}</Badge>
+              </TableCell>
+              <TableCell>
+                <Badge variant="outline">
+                  {batchName ? `${className} - ${batchName}` : className}
+                </Badge>
+              </TableCell>
+              <TableCell>{assignment.dueDate}</TableCell>
+              <TableCell>
+                <Badge variant={status === "Active" ? "default" : "outline"}>
+                  {status}
+                </Badge>
+              </TableCell>
+              <TableCell>
+                <div className="flex items-center gap-1">
+                  <span className="font-medium">{gradedCount}</span>
+                  <span className="text-muted-foreground">/</span>
                   <span className="text-muted-foreground">
-                    {" "}
-                    / {a.numberOfStudentsWithAssignments}
+                    {submissionCount}
                   </span>
-                </TableCell>
-                <TableCell>
-                  <Badge
-                    variant={
-                      a.status === "Active"
-                        ? "default"
-                        : a.status === "Completed"
-                          ? "secondary"
-                          : "outline"
-                    }
-                  >
-                    {a.status}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex items-center justify-end gap-1">
-                    <EditAssignmentDialog
-                      assignment={a.assignment}
-                      updateAssignment={updateAssignment}
-                      classes={classes}
-                      batches={batches}
-                      subjects={subjects}
-                      classSubjects={classSubjects}
-                    />
-                    <DeleteAssignmentDialog
-                      assignmentTitle={a.assignment.title}
-                      onDelete={() => deleteAssignment(a.assignment.id)}
-                    />
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
+                </div>
+              </TableCell>
+              <TableCell className="text-right">
+                <div className="flex justify-end gap-1">
+                  {assignment.pdfUrl && (
+                    <a
+                      href={assignment.pdfUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Button variant="ghost" size="sm">
+                        <FileText className="h-3.5 w-3.5" />
+                      </Button>
+                    </a>
+                  )}
+                  <EditAssignmentDialog
+                    assignment={assignment}
+                    onUpdate={updateAssignment}
+                    classes={classes}
+                    batches={batches}
+                    subjects={subjects}
+                  />
+                  <DeleteAssignmentDialog
+                    assignmentTitle={assignment.title}
+                    onDelete={() => deleteAssignment(assignment.id)}
+                  />
+                </div>
+              </TableCell>
+            </TableRow>
+          )
+        })}
+      </TableBody>
+    </Table>
   )
 }
