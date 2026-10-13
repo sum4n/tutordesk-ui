@@ -1,4 +1,4 @@
-import { useFilter } from "@/context/FilterContext"
+import { useFilter } from "@/context/useFilter"
 import { Button } from "@/components/ui/button"
 import {
   Select,

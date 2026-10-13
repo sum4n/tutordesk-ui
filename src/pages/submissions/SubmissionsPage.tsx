@@ -2,7 +2,7 @@ import { useSubmissions } from "./hooks/useSubmissions"
 import { useFilteredSubmissions } from "./hooks/useFilteredSubmissions"
 import { GradeSubmissionDialog } from "./components/GradeSubmissionDialog"
 import { FilterBar } from "@/components/FilterBar"
-import { useFilter } from "@/context/FilterContext"
+import { useFilter } from "@/context/useFilter"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import {

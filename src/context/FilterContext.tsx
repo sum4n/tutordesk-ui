@@ -1,5 +1,6 @@
-import { createContext, useContext, useState } from "react"
+import { useState } from "react"
 import type { ReactNode } from "react"
+import { FilterContext } from "@/context/useFilter"
 
 interface FilterState {
   classId: string | null
@@ -7,17 +8,11 @@ interface FilterState {
   subjectId: string | null
 }
 
-interface FilterContextType {
-  filters: FilterState
-  setClassId: (id: string | null) => void
-  setBatchId: (id: string | null) => void
-  setSubjectId: (id: string | null) => void
-  clearFilters: () => void
+interface FilterProviderProps {
+  children: ReactNode
 }
 
-const FilterContext = createContext<FilterContextType | undefined>(undefined)
-
-export function FilterProvider({ children }: { children: ReactNode }) {
+export function FilterProvider({ children }: FilterProviderProps) {
   const [filters, setFilters] = useState<FilterState>({
     classId: null,
     batchId: null,
@@ -47,12 +42,4 @@ export function FilterProvider({ children }: { children: ReactNode }) {
       {children}
     </FilterContext.Provider>
   )
-}
-
-export function useFilter() {
-  const context = useContext(FilterContext)
-  if (!context) {
-    throw new Error("useFilter must be used within FilterProvider")
-  }
-  return context
 }

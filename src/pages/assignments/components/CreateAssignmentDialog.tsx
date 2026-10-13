@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { useFilter } from "@/context/FilterContext"
+import { useFilter } from "@/context/useFilter"
 import {
   Dialog,
   DialogContent,
