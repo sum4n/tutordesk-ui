@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useFilter } from "@/context/useFilter"
 import {
   Dialog,
@@ -49,9 +49,12 @@ export function CreateAssignmentDialog({
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Pre-fill from context when dialog opens
-  useEffect(() => {
-    if (open) {
+  // Handle open/close, pre-fill on open, reset on close
+  const handleOpenChange = (newOpen: boolean) => {
+    setOpen(newOpen)
+
+    if (newOpen) {
+      // Pre-fill from context when dialog opens
       if (filters.classId) {
         const selectedClass = classes.find((c) => c.id === filters.classId)
         if (selectedClass) setClassName(selectedClass.name)
@@ -64,8 +67,18 @@ export function CreateAssignmentDialog({
         const selectedSubject = subjects.find((s) => s.id === filters.subjectId)
         if (selectedSubject) setSubjectName(selectedSubject.name)
       }
+    } else {
+      // Reset form when dialog closes
+      setTitle("")
+      setDescription("")
+      setPdfUrl("")
+      setDueDate("")
+      setClassName("")
+      setBatchName("none")
+      setSubjectName("")
+      setError(null)
     }
-  }, [open, filters, classes, batches, subjects])
+  }
 
   const selectedClass = classes.find((c) => c.name === className)
   const filteredBatches = batches.filter((b) => b.classId === selectedClass?.id)
@@ -112,14 +125,8 @@ export function CreateAssignmentDialog({
         throw new Error("Failed to create assignment")
       }
 
-      setTitle("")
-      setDescription("")
-      setPdfUrl("")
-      setDueDate("")
-      setClassName("")
-      setBatchName("none")
-      setSubjectName("")
-      setOpen(false)
+      // Reset form, close dialog, and refresh parent
+      handleOpenChange(false)
       onAssignmentCreated()
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred")
@@ -129,13 +136,16 @@ export function CreateAssignmentDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="gap-1.5">
-          <Plus className="h-4 w-4" />
-          Create Assignment
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      {/* Base UI render prop syntax */}
+      <DialogTrigger
+        render={
+          <Button className="gap-1.5">
+            <Plus className="h-4 w-4" />
+            Create Assignment
+          </Button>
+        }
+      />
       <DialogContent className="sm:max-w-[600px]">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
@@ -269,7 +279,7 @@ export function CreateAssignmentDialog({
             <Button
               type="button"
               variant="outline"
-              onClick={() => setOpen(false)}
+              onClick={() => handleOpenChange(false)}
             >
               Cancel
             </Button>
