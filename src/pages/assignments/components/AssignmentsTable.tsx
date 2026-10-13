@@ -8,7 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Pencil, Trash2, ExternalLink, FileText } from "lucide-react"
+import { FileText } from "lucide-react"
 import { EditAssignmentDialog } from "./EditAssignmentDialog"
 import { DeleteAssignmentDialog } from "./DeleteAssignmentDialog"
 import type { Class, Batch, Subject } from "@/types"
