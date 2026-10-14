@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate, useLocation } from "react-router"
+import { Routes, Route, Navigate, useLocation, Outlet } from "react-router"
 import { Sidebar } from "@/components/layout/Sidebar"
 import { TopBar } from "@/components/layout/TopBar"
 import { DashboardPage } from "@/pages/dashboard/DashboardPage"
@@ -7,37 +7,135 @@ import { StudentsPage } from "@/pages/students/StudentsPage"
 import { AssignmentsPage } from "@/pages/assignments/AssignmentsPage"
 import { SubmissionsPage } from "@/pages/submissions/SubmissionsPage"
 import { SubjectsPage } from "@/pages/subjects/SubjectsPage"
+import { LoginPage } from "@/pages/auth/LoginPage"
+import { SignupPage } from "@/pages/auth/SignupPage"
+import { ProtectedRoute } from "@/components/ProtectedRoute"
 import { pageMeta } from "@/config/appConfig"
 import type { PageKey } from "@/types"
 import { FilterProvider } from "@/context/FilterContext"
+import { AuthProvider } from "@/context/AuthContext"
 
-export default function App() {
+// Layout for authenticated users (Sidebar + TopBar)
+function AuthenticatedLayout() {
   const location = useLocation()
-
-  // Extract current page form URL
   const currentPage = location.pathname.slice(1) || "dashboard"
   const meta = pageMeta[currentPage as PageKey] || pageMeta.dashboard
 
   return (
-    <FilterProvider>
-      <div className="flex h-screen bg-background text-foreground">
-        <Sidebar />
-        <div className="flex min-w-0 flex-1 flex-col">
-          <TopBar title={meta.title} subtitle={meta.subtitle} />
-
-          <main className="flex-1 overflow-auto">
-            <Routes>
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
-              <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/classes" element={<ClassesPage />} />
-              <Route path="/students" element={<StudentsPage />} />
-              <Route path="/assignments" element={<AssignmentsPage />} />
-              <Route path="/submissions" element={<SubmissionsPage />} />
-              <Route path="/subjects" element={<SubjectsPage />} />
-            </Routes>
-          </main>
-        </div>
+    <div className="flex h-screen bg-background text-foreground">
+      <Sidebar />
+      <div className="flex min-w-0 flex-1 flex-col">
+        <TopBar title={meta.title} subtitle={meta.subtitle} />
+        <main className="flex-1 overflow-auto">
+          <Outlet />
+        </main>
       </div>
-    </FilterProvider>
+    </div>
+  )
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <FilterProvider>
+        <Routes>
+          {/* 1. Public Routes (No layout, no auth required) */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+
+          {/* 2. Protected Layout Route (Checks if user is logged in) */}
+          <Route
+            element={
+              <ProtectedRoute>
+                <AuthenticatedLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+
+            {/* 3. Teacher-Only Routes */}
+            <Route
+              path="/classes"
+              element={
+                <ProtectedRoute requiredRole="teacher">
+                  <ClassesPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/students"
+              element={
+                <ProtectedRoute requiredRole="teacher">
+                  <StudentsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/assignments"
+              element={
+                <ProtectedRoute requiredRole="teacher">
+                  <AssignmentsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/submissions"
+              element={
+                <ProtectedRoute requiredRole="teacher">
+                  <SubmissionsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/subjects"
+              element={
+                <ProtectedRoute requiredRole="teacher">
+                  <SubjectsPage />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* 4. Shared Dashboard Route (NO requiredRole - both can access) */}
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <DashboardPage />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* 5. Student-Only Routes */}
+            <Route
+              path="/my-assignments"
+              element={
+                <ProtectedRoute requiredRole="student">
+                  <div className="flex h-full items-center justify-center">
+                    <p className="text-muted-foreground">
+                      My Assignments — Coming Soon
+                    </p>
+                  </div>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/my-grades"
+              element={
+                <ProtectedRoute requiredRole="student">
+                  <div className="flex h-full items-center justify-center">
+                    <p className="text-muted-foreground">
+                      My Grades — Coming Soon
+                    </p>
+                  </div>
+                </ProtectedRoute>
+              }
+            />
+          </Route>
+
+          {/* 6. Catch-all: Redirect unknown routes to login */}
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </Routes>
+      </FilterProvider>
+    </AuthProvider>
   )
 }
