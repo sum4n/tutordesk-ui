@@ -1,8 +1,8 @@
 import { useLocation, useNavigate } from "react-router"
+import { useAuth } from "@/context/useAuth"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { navItems } from "@/config/appConfig"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,34 +15,62 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   BadgeCheckIcon,
   BellIcon,
-  CreditCardIcon,
   LogOutIcon,
   EllipsisVertical,
   LayoutDashboard,
+  Users,
+  FileText,
+  CheckCircle,
+  BookOpen,
+  GraduationCap,
 } from "lucide-react"
 
 export function Sidebar() {
   const location = useLocation()
   const navigate = useNavigate()
+  const { user, logout } = useAuth()
 
+  const isTeacher = user?.role === "teacher"
   const isActive = (path: string) => location.pathname === path
+
+  const handleLogout = () => {
+    logout()
+    navigate("/login")
+  }
+
+  // Helper to get initials for avatar fallback
+  const getInitials = (name?: string) => {
+    return name
+      ? name
+          .split(" ")
+          .map((n) => n[0])
+          .join("")
+          .toUpperCase()
+          .slice(0, 2)
+      : "U"
+  }
 
   return (
     <aside className="flex w-60 flex-col border-r bg-background">
+      {/* Header */}
       <div className="flex items-center gap-2 px-4 py-4">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-sm font-bold text-primary-foreground">
-          T
+          <GraduationCap className="h-5 w-5" />
         </div>
         <div>
           <div className="text-sm font-semibold">TutorDesk</div>
-          <div className="text-xs text-muted-foreground">Teacher Dashboard</div>
+          <div className="text-xs text-muted-foreground">
+            {isTeacher ? "Teacher Portal" : "Student Portal"}
+          </div>
         </div>
       </div>
 
       <Separator />
 
+      {/* Navigation Links */}
       <ScrollArea className="flex-1 py-3">
         <div className="space-y-6 px-4">
+          {/* Overview Section */}
           <div>
             <div className="mb-2 px-2 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
               Overview
@@ -59,24 +87,79 @@ export function Sidebar() {
             </nav>
           </div>
 
+          {/* Manage Section (Role-Based) */}
           <div>
             <div className="mb-2 px-2 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-              Manage
+              {isTeacher ? "Manage" : "My Learning"}
             </div>
             <nav className="space-y-1">
-              {navItems.slice(1).map((item) => {
-                return (
+              {isTeacher ? (
+                // Teacher Links
+                <>
                   <Button
-                    key={item.key}
-                    variant={isActive(`/${item.key}`) ? "secondary" : "ghost"}
+                    variant={isActive("/classes") ? "secondary" : "ghost"}
                     className="w-full justify-start gap-2"
-                    onClick={() => navigate(`/${item.key}`)}
+                    onClick={() => navigate("/classes")}
                   >
-                    <item.Icon className="h-4 w-4" />
-                    {item.label}
+                    <Users className="h-4 w-4" />
+                    Classes
                   </Button>
-                )
-              })}
+                  <Button
+                    variant={isActive("/students") ? "secondary" : "ghost"}
+                    className="w-full justify-start gap-2"
+                    onClick={() => navigate("/students")}
+                  >
+                    <Users className="h-4 w-4" />
+                    Students
+                  </Button>
+                  <Button
+                    variant={isActive("/assignments") ? "secondary" : "ghost"}
+                    className="w-full justify-start gap-2"
+                    onClick={() => navigate("/assignments")}
+                  >
+                    <FileText className="h-4 w-4" />
+                    Assignments
+                  </Button>
+                  <Button
+                    variant={isActive("/submissions") ? "secondary" : "ghost"}
+                    className="w-full justify-start gap-2"
+                    onClick={() => navigate("/submissions")}
+                  >
+                    <CheckCircle className="h-4 w-4" />
+                    Submissions
+                  </Button>
+                  <Button
+                    variant={isActive("/subjects") ? "secondary" : "ghost"}
+                    className="w-full justify-start gap-2"
+                    onClick={() => navigate("/subjects")}
+                  >
+                    <BookOpen className="h-4 w-4" />
+                    Subjects
+                  </Button>
+                </>
+              ) : (
+                // Student Links
+                <>
+                  <Button
+                    variant={
+                      isActive("/my-assignments") ? "secondary" : "ghost"
+                    }
+                    className="w-full justify-start gap-2"
+                    onClick={() => navigate("/my-assignments")}
+                  >
+                    <FileText className="h-4 w-4" />
+                    My Assignments
+                  </Button>
+                  <Button
+                    variant={isActive("/my-grades") ? "secondary" : "ghost"}
+                    className="w-full justify-start gap-2"
+                    onClick={() => navigate("/my-grades")}
+                  >
+                    <CheckCircle className="h-4 w-4" />
+                    My Grades
+                  </Button>
+                </>
+              )}
             </nav>
           </div>
         </div>
@@ -84,42 +167,41 @@ export function Sidebar() {
 
       <Separator />
 
+      {/* User Dropdown Menu */}
       <div className="p-3">
         <DropdownMenu>
           <DropdownMenuTrigger
             render={
               <Button
                 variant="ghost"
-                className="w-full justify-start pt-6 pb-6"
+                className="h-auto w-full justify-start py-3"
               >
-                <div className="flex w-full content-center gap-2">
-                  <Avatar className="self-center">
+                <div className="flex w-full items-center gap-2">
+                  <Avatar className="h-8 w-8">
                     <AvatarImage
                       src="https://github.com/shadcn.png"
                       alt="User"
                     />
-                    <AvatarFallback>LR</AvatarFallback>
+                    <AvatarFallback>{getInitials(user?.name)}</AvatarFallback>
                   </Avatar>
-                  <div className="text-left">
-                    <p className="truncate font-medium">User name</p>
-                    <p className="truncate text-xs text-muted-foreground">
-                      User email
+                  <div className="flex flex-col items-start overflow-hidden text-left">
+                    <p className="w-full truncate text-sm font-medium">
+                      {user?.name || "User"}
+                    </p>
+                    <p className="w-full truncate text-xs text-muted-foreground">
+                      {user?.email || "user@email.com"}
                     </p>
                   </div>
-                  <EllipsisVertical className="ml-auto self-center" />
+                  <EllipsisVertical className="ml-auto h-4 w-4 text-muted-foreground" />
                 </div>
               </Button>
             }
           />
-          <DropdownMenuContent side="right" align="end">
+          <DropdownMenuContent side="right" align="end" className="w-56">
             <DropdownMenuGroup>
               <DropdownMenuItem>
                 <BadgeCheckIcon className="mr-2 h-4 w-4" />
                 Account
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCardIcon className="mr-2 h-4 w-4" />
-                Billing
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <BellIcon className="mr-2 h-4 w-4" />
@@ -127,7 +209,10 @@ export function Sidebar() {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={handleLogout}
+              className="text-red-600 focus:bg-red-50 focus:text-red-600 dark:focus:bg-red-950"
+            >
               <LogOutIcon className="mr-2 h-4 w-4" />
               Sign Out
             </DropdownMenuItem>
