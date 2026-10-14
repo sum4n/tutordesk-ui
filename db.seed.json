@@ -114,5 +114,32 @@
       "grade": "A",
       "feedback": "Excellent work"
     }
+  ],
+  "users": [
+    {
+      "id": "u1",
+      "email": "teacher@example.com",
+      "password": "password123",
+      "name": "Mr. Sharma",
+      "role": "teacher"
+    },
+    {
+      "id": "u2",
+      "email": "aarav@email.com",
+      "password": "student123",
+      "name": "Aarav Reddy",
+      "role": "student",
+      "classId": "c1",
+      "batchId": "b1"
+    },
+    {
+      "id": "u3",
+      "email": "priya@email.com",
+      "password": "student123",
+      "name": "Priya Sharma",
+      "role": "student",
+      "classId": "c1",
+      "batchId": "b1"
+    }
   ]
 }
