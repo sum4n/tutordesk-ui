@@ -18,7 +18,7 @@ export const navItems: NavItem[] = [
 ]
 
 export const pageMeta: Record<PageKey, PageMeta> = {
-  dashboard: { title: "Dashboard", subtitle: "Welcome back, Teacher Mom" },
+  dashboard: { title: "Dashboard", subtitle: "Welcome back" },
   classes: {
     title: "Classes & Batches",
     subtitle: "Manage your tuition classes",

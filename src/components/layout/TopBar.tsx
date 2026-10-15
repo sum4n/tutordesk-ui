@@ -22,7 +22,9 @@ export function TopBar({ title, subtitle }: TopBarProps) {
       <div>
         <h1 className="text-lg font-semibold">{title}</h1>
         {subtitle && (
-          <p className="text-sm text-muted-foreground">{subtitle}</p>
+          <p className="text-sm text-muted-foreground">
+            {subtitle} <span className="font-bold">{user?.name}</span>{" "}
+          </p>
         )}
       </div>
 
