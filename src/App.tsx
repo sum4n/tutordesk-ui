@@ -14,6 +14,7 @@ import { pageMeta } from "@/config/appConfig"
 import type { PageKey } from "@/types"
 import { FilterProvider } from "@/context/FilterContext"
 import { AuthProvider } from "@/context/AuthContext"
+import { StudentAssignmentsPage } from "./pages/student-assignments/StudentAssignmentPage"
 
 // Layout for authenticated users (Sidebar + TopBar)
 function AuthenticatedLayout() {
@@ -110,11 +111,7 @@ export default function App() {
               path="/my-assignments"
               element={
                 <ProtectedRoute requiredRole="student">
-                  <div className="flex h-full items-center justify-center">
-                    <p className="text-muted-foreground">
-                      My Assignments — Coming Soon
-                    </p>
-                  </div>
+                  <StudentAssignmentsPage />
                 </ProtectedRoute>
               }
             />
