@@ -5,6 +5,8 @@ export type PageKey =
   | "assignments"
   | "submissions"
   | "subjects"
+  | "my-assignments"
+  | "my-grades"
 
 export interface NavItem {
   key: PageKey

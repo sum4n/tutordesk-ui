@@ -36,4 +36,12 @@ export const pageMeta: Record<PageKey, PageMeta> = {
     title: "Subjects",
     subtitle: "Manage subjects",
   },
+  "my-assignments": {
+    title: "My Assignments",
+    subtitle: "View and submit your class assignments",
+  },
+  "my-grades": {
+    title: "My Grades",
+    subtitle: "View your grades and teacher feedback",
+  },
 }
