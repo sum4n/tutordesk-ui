@@ -17,7 +17,11 @@ import type { StudentAssignment } from "../hooks/useStudentAssignments"
 interface SubmitAssignmentDialogProps {
   assignment: StudentAssignment
   submissionId?: string
-  onSubmit: (assignmentId: string, studentPdfUrl: string) => Promise<void>
+  onSubmit: (
+    assignmentId: string,
+    studentPdfUrl: string,
+    submissionId?: string
+  ) => Promise<void>
   isResubmit?: boolean
 }
 
