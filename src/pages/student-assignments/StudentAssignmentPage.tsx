@@ -115,8 +115,7 @@ export function StudentAssignmentsPage() {
             <TableBody>
               {assignments.map((assignment) => {
                 const isOverdue = new Date(assignment.dueDate) < new Date()
-                const hasSubmitted = !!assignment.submission
-                const isGraded = assignment.submission?.status === "graded"
+                const status = assignment.submission?.status
 
                 return (
                   <TableRow key={assignment.id}>
@@ -138,22 +137,27 @@ export function StudentAssignmentsPage() {
                     <TableCell>
                       <div>
                         <div>{assignment.dueDate}</div>
-                        {isOverdue && !hasSubmitted && (
+                        {isOverdue && !status && (
                           <div className="text-xs text-red-500">Overdue</div>
                         )}
                       </div>
                     </TableCell>
+
+                    {/* EXPLICIT STATUS BADGE LOGIC */}
                     <TableCell>
-                      {!hasSubmitted ? (
+                      {!status ? (
                         <Badge variant="outline">Not Submitted</Badge>
-                      ) : isGraded ? (
+                      ) : status === "submitted" ? (
+                        <Badge variant="secondary">Submitted</Badge>
+                      ) : status === "graded" ? (
                         <Badge variant="default">
                           Graded: {assignment.submission?.grade}
                         </Badge>
-                      ) : (
-                        <Badge variant="secondary">Submitted</Badge>
-                      )}
+                      ) : status === "returned" ? (
+                        <Badge variant="destructive">Returned</Badge>
+                      ) : null}
                     </TableCell>
+
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
                         {assignment.pdfUrl && (
@@ -167,23 +171,29 @@ export function StudentAssignmentsPage() {
                             </Button>
                           </a>
                         )}
-                        {!hasSubmitted && (
+
+                        {/* SHOW SUBMIT/RESUBMIT BUTTON */}
+                        {(!status || status === "returned") && (
                           <SubmitAssignmentDialog
                             assignment={assignment}
+                            submissionId={assignment.submission?.id}
                             onSubmit={submitAssignment}
+                            isResubmit={status === "returned"}
                           />
                         )}
-                        {isGraded && assignment.submission?.teacherPdfUrl && (
-                          <a
-                            href={assignment.submission.teacherPdfUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            <Button variant="outline" size="sm">
-                              View Feedback
-                            </Button>
-                          </a>
-                        )}
+
+                        {status === "graded" &&
+                          assignment.submission?.teacherPdfUrl && (
+                            <a
+                              href={assignment.submission.teacherPdfUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              <Button variant="outline" size="sm">
+                                View Feedback
+                              </Button>
+                            </a>
+                          )}
                       </div>
                     </TableCell>
                   </TableRow>

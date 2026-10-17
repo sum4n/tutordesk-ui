@@ -16,12 +16,16 @@ import type { StudentAssignment } from "../hooks/useStudentAssignments"
 
 interface SubmitAssignmentDialogProps {
   assignment: StudentAssignment
+  submissionId?: string
   onSubmit: (assignmentId: string, studentPdfUrl: string) => Promise<void>
+  isResubmit?: boolean
 }
 
 export function SubmitAssignmentDialog({
   assignment,
+  submissionId,
   onSubmit,
+  isResubmit,
 }: SubmitAssignmentDialogProps) {
   const [open, setOpen] = useState(false)
   const [pdfUrl, setPdfUrl] = useState("")
@@ -39,7 +43,7 @@ export function SubmitAssignmentDialog({
     setError(null)
 
     try {
-      await onSubmit(assignment.id, pdfUrl)
+      await onSubmit(assignment.id, pdfUrl, submissionId)
       setPdfUrl("")
       setOpen(false)
     } catch (err) {
@@ -62,9 +66,13 @@ export function SubmitAssignmentDialog({
       <DialogContent>
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>Submit Assignment</DialogTitle>
+            <DialogTitle>
+              {isResubmit ? "Resubmit Assignment" : "Submit Assignment"}
+            </DialogTitle>
             <DialogDescription>
-              Submit your work for "{assignment.title}"
+              {isResubmit
+                ? "Your teacher has asked for revisions. Please upload your updated work"
+                : `Submit your work for "${assignment.title}"`}
             </DialogDescription>
           </DialogHeader>
 

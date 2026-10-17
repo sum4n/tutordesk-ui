@@ -111,31 +111,55 @@ export function useStudentAssignments() {
     }
   }, [user])
 
+  // 1. Update the signature to accept an optional submissionId
   const submitAssignment = useCallback(
-    async (assignmentId: string, studentPdfUrl: string) => {
+    async (
+      assignmentId: string,
+      studentPdfUrl: string,
+      submissionId?: string
+    ) => {
       if (!user?.studentId) {
         throw new Error("Student ID not found")
       }
 
       const apiUrl = import.meta.env.VITE_API_BASE_URL
-      const response = await fetch(`${apiUrl}/submissions`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          assignmentId,
-          studentId: user.studentId,
-          status: "submitted",
-          studentPdfUrl,
-          submittedAt: new Date().toISOString().split("T")[0],
-          teacherPdfUrl: null,
-          gradedAt: null,
-          grade: null,
-          feedback: null,
-        }),
-      })
 
-      if (!response.ok) {
-        throw new Error("Failed to submit assignment")
+      // 2. If submissionId exists, we are resubmitting an existing record (PATCH)
+      if (submissionId) {
+        const response = await fetch(`${apiUrl}/submissions/${submissionId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            status: "submitted",
+            studentPdfUrl,
+            submittedAt: new Date().toISOString().split("T")[0],
+            // Clear old grading data for the fresh attempt
+            grade: null,
+            feedback: null,
+            teacherPdfUrl: null,
+            gradedAt: null,
+          }),
+        })
+        if (!response.ok) throw new Error("Failed to resubmit assignment")
+      }
+      // 3. Otherwise, it's a brand new submission (POST)
+      else {
+        const response = await fetch(`${apiUrl}/submissions`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            assignmentId,
+            studentId: user.studentId,
+            status: "submitted",
+            studentPdfUrl,
+            submittedAt: new Date().toISOString().split("T")[0],
+            teacherPdfUrl: null,
+            gradedAt: null,
+            grade: null,
+            feedback: null,
+          }),
+        })
+        if (!response.ok) throw new Error("Failed to submit assignment")
       }
 
       await fetchAssignments()
