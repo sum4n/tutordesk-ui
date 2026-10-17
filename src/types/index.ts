@@ -68,7 +68,7 @@ export interface Submission {
   id: string
   assignmentId: string
   studentId: string
-  status: "pending" | "submitted" | "graded"
+  status: "pending" | "submitted" | "graded" | "returned"
   studentPdfUrl: string | null
   submittedAt: string | null
   teacherPdfUrl: string | null

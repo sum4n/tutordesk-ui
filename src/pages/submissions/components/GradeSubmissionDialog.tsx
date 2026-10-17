@@ -23,7 +23,7 @@ interface GradeSubmissionDialogProps {
       grade?: string | null
       feedback?: string | null
       teacherPdfUrl?: string | null
-      status?: "submitted" | "graded"
+      status?: "submitted" | "graded" | "returned"
     }
   ) => Promise<void>
 }
@@ -84,7 +84,6 @@ export function GradeSubmissionDialog({
               Grade this submission and provide feedback to the student.
             </DialogDescription>
           </DialogHeader>
-
           <div className="space-y-4 py-4">
             {/* Submission Info */}
             <div className="space-y-2 rounded-md border p-4">
@@ -175,19 +174,51 @@ export function GradeSubmissionDialog({
               {error && <p className="text-sm text-red-500">{error}</p>}
             </div>
           </div>
+          <DialogFooter className="flex flex-col gap-3 sm:flex-row sm:justify-between">
+            {/* Show "Return for Revision" if it's submitted OR already graded */}
+            {(submission.submission.status === "submitted" ||
+              submission.submission.status === "graded") && (
+              <Button
+                type="button"
+                variant="outline"
+                className="border-orange-200 text-orange-600 hover:bg-orange-50 hover:text-orange-700 sm:order-1"
+                onClick={async () => {
+                  setLoading(true)
+                  try {
+                    await onGrade(submission.submission.id, {
+                      status: "returned",
+                      // If the teacher typed feedback before clicking return, save it!
+                      feedback:
+                        feedback || submission.submission.feedback || null,
+                    })
+                    setOpen(false)
+                  } catch (err) {
+                    setError(
+                      err instanceof Error ? err.message : "An error occurred"
+                    )
+                  } finally {
+                    setLoading(false)
+                  }
+                }}
+                disabled={loading}
+              >
+                Return for Revision
+              </Button>
+            )}
 
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? "Saving..." : "Save Grade"}
-            </Button>
-          </DialogFooter>
+            <div className="flex gap-2 sm:order-2 sm:ml-auto">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={loading}>
+                {loading ? "Saving..." : "Save Grade"}
+              </Button>
+            </div>
+          </DialogFooter>{" "}
         </form>
       </DialogContent>
     </Dialog>

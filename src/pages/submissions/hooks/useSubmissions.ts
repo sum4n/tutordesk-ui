@@ -24,7 +24,7 @@ interface SubmissionsData {
       grade?: string | null
       feedback?: string | null
       teacherPdfUrl?: string | null
-      status?: "submitted" | "graded"
+      status?: "submitted" | "graded" | "returned"
     }
   ) => Promise<void>
 }
@@ -107,7 +107,7 @@ export function useSubmissions(): SubmissionsData {
         grade?: string | null
         feedback?: string | null
         teacherPdfUrl?: string | null
-        status?: "submitted" | "graded"
+        status?: "submitted" | "graded" | "returned"
       }
     ) => {
       const apiUrl = import.meta.env.VITE_API_BASE_URL
