@@ -33,6 +33,9 @@ export function StudentDashboard() {
     (a) => a.submission?.status === "submitted"
   )
   const graded = assignments.filter((a) => a.submission?.status === "graded")
+  const returned = assignments.filter(
+    (a) => a.submission?.status === "returned"
+  )
 
   // Upcoming deadlines: not submitted, sorted by due date ascending, top 5
   const upcomingDeadlines = pending
@@ -88,11 +91,19 @@ export function StudentDashboard() {
               <Clock className="h-4 w-4 text-orange-500" />
               <p className="text-sm text-muted-foreground">Pending</p>
             </div>
-            <p className="text-2xl font-bold">{pending.length}</p>
+            <p className="text-2xl font-bold">
+              {pending.length + returned.length}
+            </p>
             <p className="text-xs text-muted-foreground">
-              {overdue.length > 0
-                ? `${overdue.length} overdue`
-                : "All on track"}
+              {returned.length > 0 ? (
+                <span className="font-medium text-orange-600">
+                  {returned.length} returned for revision
+                </span>
+              ) : overdue.length > 0 ? (
+                `${overdue.length} overdue`
+              ) : (
+                "All on track"
+              )}
             </p>
           </CardHeader>
         </Card>

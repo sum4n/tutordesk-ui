@@ -60,6 +60,9 @@ export function StudentAssignmentsPage() {
   const gradedCount = assignments.filter(
     (a) => a.submission?.status === "graded"
   ).length
+  const returned = assignments.filter(
+    (a) => a.submission?.status === "returned"
+  )
 
   return (
     <div className="space-y-6 p-6">
@@ -77,7 +80,20 @@ export function StudentAssignmentsPage() {
               <Clock className="h-4 w-4 text-muted-foreground" />
               <p className="text-sm text-muted-foreground">Pending</p>
             </div>
-            <p className="text-2xl font-bold">{pendingCount}</p>
+            <p className="text-2xl font-bold">
+              {pendingCount + returned.length}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {returned.length > 0 ? (
+                <span className="font-medium text-orange-600">
+                  {returned.length} returned for revision
+                </span>
+              ) : pendingCount > 0 ? (
+                `${pendingCount} overdue`
+              ) : (
+                "All on track"
+              )}
+            </p>
           </CardHeader>
         </Card>
         <Card>
