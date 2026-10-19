@@ -35,36 +35,6 @@
       "name": "Physical Science"
     }
   ],
-  "students": [
-    {
-      "id": "st1",
-      "name": "Aarav Reddy",
-      "email": "aarav@email.com",
-      "classId": "c1",
-      "batchId": "b1"
-    },
-    {
-      "id": "st2",
-      "name": "Priya Sharma",
-      "email": "priya@email.com",
-      "classId": "c1",
-      "batchId": "b1"
-    },
-    {
-      "id": "st3",
-      "name": "Rohan Kumar",
-      "email": "rohan@email.com",
-      "classId": "c1",
-      "batchId": "b2"
-    },
-    {
-      "id": "st4",
-      "name": "Diya Patel",
-      "email": "diya@email.com",
-      "classId": "c2",
-      "batchId": null
-    }
-  ],
   "assignments": [
     {
       "id": "a1",
@@ -87,25 +57,69 @@
       "subjectId": "s2",
       "dueDate": "2026-09-22",
       "createdAt": "2026-09-18"
+    },
+    {
+      "id": "FWrsWqHUhuQ",
+      "title": "Chapter 12",
+      "description": "Chapter 12 problems",
+      "pdfUrl": "chapter12.pdf",
+      "classId": "c2",
+      "batchId": null,
+      "subjectId": "s2",
+      "dueDate": "2026-10-16",
+      "createdAt": "2026-10-15"
+    },
+    {
+      "id": "NUrdTGtLvME",
+      "title": "Chapter 1",
+      "description": "abc",
+      "pdfUrl": "abc",
+      "classId": "c2",
+      "batchId": null,
+      "subjectId": "s2",
+      "dueDate": "2026-10-18",
+      "createdAt": "2026-10-17"
+    },
+    {
+      "id": "A8Zi9vw19QE",
+      "title": "Chapter 3",
+      "description": "chapter 3",
+      "pdfUrl": "chapter 3",
+      "classId": "c2",
+      "batchId": null,
+      "subjectId": "s1",
+      "dueDate": "2026-10-22",
+      "createdAt": "2026-10-17"
+    },
+    {
+      "id": "3lMTuH2tyiQ",
+      "title": "AGCV",
+      "description": "1233",
+      "pdfUrl": "abc",
+      "classId": "c1",
+      "batchId": null,
+      "subjectId": "s2",
+      "dueDate": "2026-10-23",
+      "createdAt": "2026-10-17"
     }
   ],
   "submissions": [
     {
       "id": "sub1",
       "assignmentId": "a1",
-      "studentId": "st1",
-      "status": "submitted",
+      "studentId": "u2",
+      "status": "graded",
       "studentPdfUrl": "aarav-quad.pdf",
       "submittedAt": "2026-09-22",
-      "teacherPdfUrl": null,
-      "gradedAt": null,
-      "grade": null,
-      "feedback": null
+      "teacherPdfUrl": "pdf.pdf",
+      "gradedAt": "2026-10-16",
+      "grade": "A",
+      "feedback": "Good"
     },
     {
       "id": "sub2",
       "assignmentId": "a1",
-      "studentId": "st2",
+      "studentId": "u3",
       "status": "graded",
       "studentPdfUrl": "priya-quad.pdf",
       "submittedAt": "2026-09-21",
@@ -113,6 +127,66 @@
       "gradedAt": "2026-09-23",
       "grade": "A",
       "feedback": "Excellent work"
+    },
+    {
+      "id": "6B0xVlrbAoY",
+      "assignmentId": "FWrsWqHUhuQ",
+      "studentId": "KwnBgniB3wM",
+      "status": "submitted",
+      "studentPdfUrl": "a",
+      "submittedAt": "2026-10-15",
+      "teacherPdfUrl": null,
+      "gradedAt": null,
+      "grade": null,
+      "feedback": null
+    },
+    {
+      "id": "5Dp5gCGh2u4",
+      "assignmentId": "FWrsWqHUhuQ",
+      "studentId": "KwnBgniB3wM",
+      "status": "returned",
+      "studentPdfUrl": "sf",
+      "submittedAt": "2026-10-16",
+      "teacherPdfUrl": null,
+      "gradedAt": "2026-10-19",
+      "grade": null,
+      "feedback": null
+    },
+    {
+      "id": "DZq8LXOdRb4",
+      "assignmentId": "FWrsWqHUhuQ",
+      "studentId": "KwnBgniB3wM",
+      "status": "returned",
+      "studentPdfUrl": "e",
+      "submittedAt": "2026-10-17",
+      "teacherPdfUrl": null,
+      "gradedAt": "2026-10-17",
+      "grade": "D",
+      "feedback": null
+    },
+    {
+      "id": "3z_1alKbKEg",
+      "assignmentId": "A8Zi9vw19QE",
+      "studentId": "KwnBgniB3wM",
+      "status": "graded",
+      "studentPdfUrl": "answer",
+      "submittedAt": "2026-10-17",
+      "teacherPdfUrl": "gradedpdf",
+      "gradedAt": "2026-10-17",
+      "grade": "B",
+      "feedback": "Good"
+    },
+    {
+      "id": "ntI2IRrQ-7Q",
+      "assignmentId": "NUrdTGtLvME",
+      "studentId": "KwnBgniB3wM",
+      "status": "submitted",
+      "studentPdfUrl": "abc",
+      "submittedAt": "2026-10-17",
+      "teacherPdfUrl": null,
+      "gradedAt": null,
+      "grade": null,
+      "feedback": null
     }
   ],
   "users": [
@@ -140,6 +214,15 @@
       "role": "student",
       "classId": "c1",
       "batchId": "b1"
+    },
+    {
+      "id": "KwnBgniB3wM",
+      "email": "one@test.com",
+      "password": "student",
+      "name": "one test",
+      "role": "student",
+      "classId": "c1",
+      "batchId": null
     }
   ]
 }
