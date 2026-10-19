@@ -38,7 +38,7 @@ export function useStudentAssignments() {
         fetch(`${apiUrl}/subjects`),
         fetch(`${apiUrl}/classes`),
         fetch(`${apiUrl}/batches`),
-        fetch(`${apiUrl}/submissions?studentId=${user.studentId}`),
+        fetch(`${apiUrl}/submissions?studentId=${user.id}`),
       ])
 
       if (
@@ -118,7 +118,7 @@ export function useStudentAssignments() {
       studentPdfUrl: string,
       submissionId?: string
     ) => {
-      if (!user?.studentId) {
+      if (!user?.id || user.role !== "student") {
         throw new Error("Student ID not found")
       }
 
@@ -149,7 +149,7 @@ export function useStudentAssignments() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             assignmentId,
-            studentId: user.studentId,
+            studentId: user.id,
             status: "submitted",
             studentPdfUrl,
             submittedAt: new Date().toISOString().split("T")[0],

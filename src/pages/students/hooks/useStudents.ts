@@ -48,7 +48,7 @@ export function useStudents(): StudentsData {
         assignmentsRes,
         submissionsRes,
       ] = await Promise.all([
-        fetch(`${apiUrl}/students`),
+        fetch(`${apiUrl}/users?role=student`),
         fetch(`${apiUrl}/classes`),
         fetch(`${apiUrl}/batches`),
         fetch(`${apiUrl}/assignments`),
@@ -100,7 +100,7 @@ export function useStudents(): StudentsData {
       batchId?: string | null
     }) => {
       const apiUrl = import.meta.env.VITE_API_BASE_URL
-      const response = await fetch(`${apiUrl}/students`, {
+      const response = await fetch(`${apiUrl}/users?role=student`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -126,7 +126,7 @@ export function useStudents(): StudentsData {
       }
     ) => {
       const apiUrl = import.meta.env.VITE_API_BASE_URL
-      const response = await fetch(`${apiUrl}/students/${id}`, {
+      const response = await fetch(`${apiUrl}/users/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -144,7 +144,7 @@ export function useStudents(): StudentsData {
   const deleteStudent = useCallback(
     async (id: string) => {
       const apiUrl = import.meta.env.VITE_API_BASE_URL
-      const response = await fetch(`${apiUrl}/students/${id}`, {
+      const response = await fetch(`${apiUrl}/users/${id}`, {
         method: "DELETE",
       })
 
