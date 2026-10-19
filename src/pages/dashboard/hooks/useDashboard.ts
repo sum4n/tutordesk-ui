@@ -45,7 +45,7 @@ export function useDashboard(): DashboardData {
 
         const [studentsRes, classesRes, assignmentsRes, submissionsRes] =
           await Promise.all([
-            fetch(`${apiUrl}/students`),
+            fetch(`${apiUrl}/users?role=student`),
             fetch(`${apiUrl}/classes`),
             fetch(`${apiUrl}/assignments`),
             fetch(`${apiUrl}/submissions`),

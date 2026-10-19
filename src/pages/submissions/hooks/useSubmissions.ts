@@ -53,7 +53,7 @@ export function useSubmissions(): SubmissionsData {
       ] = await Promise.all([
         fetch(`${apiUrl}/submissions`),
         fetch(`${apiUrl}/assignments`),
-        fetch(`${apiUrl}/students`),
+        fetch(`${apiUrl}/users?role=student`),
         fetch(`${apiUrl}/classes`),
         fetch(`${apiUrl}/batches`),
         fetch(`${apiUrl}/subjects`),

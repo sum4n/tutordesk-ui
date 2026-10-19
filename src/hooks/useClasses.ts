@@ -33,7 +33,7 @@ export function useClasses(): ClassesData {
       const [classesRes, studentsRes, assignmentsRes, batchesRes] =
         await Promise.all([
           fetch(`${apiUrl}/classes`),
-          fetch(`${apiUrl}/students`),
+          fetch(`${apiUrl}/users?role=student`),
           fetch(`${apiUrl}/assignments`),
           fetch(`${apiUrl}/batches`),
           fetch(`${apiUrl}/subjects`),
