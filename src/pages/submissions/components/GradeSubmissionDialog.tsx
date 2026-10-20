@@ -49,6 +49,9 @@ export function GradeSubmissionDialog({
 
   const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
+    // Can not grade if submission status is returned
+    if (submission.submission.status === "returned") return
+
     setLoading(true)
     setError(null)
 
@@ -218,9 +221,11 @@ export function GradeSubmissionDialog({
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={loading}>
-                {loading ? "Saving..." : "Save Grade"}
-              </Button>
+              {submission.submission.status !== "returned" && (
+                <Button type="submit" disabled={loading}>
+                  {loading ? "Saving..." : "Save Grade"}
+                </Button>
+              )}
             </div>
           </DialogFooter>{" "}
         </form>
