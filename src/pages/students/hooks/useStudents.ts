@@ -100,10 +100,18 @@ export function useStudents(): StudentsData {
       batchId?: string | null
     }) => {
       const apiUrl = import.meta.env.VITE_API_BASE_URL
-      const response = await fetch(`${apiUrl}/users?role=student`, {
+
+      // Inject role and default password
+      const payload = {
+        ...data,
+        role: "student",
+        password: "student",
+      }
+
+      const response = await fetch(`${apiUrl}/users`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       })
 
       if (!response.ok) {
