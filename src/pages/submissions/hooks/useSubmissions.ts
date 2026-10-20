@@ -21,10 +21,15 @@ interface SubmissionsData {
   gradeSubmission: (
     id: string,
     data: {
-      grade?: string | null
+      grade: string
       feedback?: string | null
       teacherPdfUrl?: string | null
-      status?: "submitted" | "graded" | "returned"
+    }
+  ) => Promise<void>
+  returnSubmission: (
+    id: string,
+    data: {
+      feedback?: string | null
     }
   ) => Promise<void>
 }
@@ -104,10 +109,9 @@ export function useSubmissions(): SubmissionsData {
     async (
       id: string,
       data: {
-        grade?: string | null
+        grade: string
         feedback?: string | null
         teacherPdfUrl?: string | null
-        status?: "submitted" | "graded" | "returned"
       }
     ) => {
       const apiUrl = import.meta.env.VITE_API_BASE_URL
@@ -115,13 +119,42 @@ export function useSubmissions(): SubmissionsData {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...data,
+          status: "graded",
+          grade: data.grade,
+          feedback: data.feedback || null,
+          teacherPdfUrl: data.teacherPdfUrl || null,
           gradedAt: new Date().toISOString().split("T")[0],
         }),
       })
 
       if (!response.ok) {
         throw new Error("Failed to grade submission")
+      }
+
+      await fetchSubmissionData()
+    },
+    [fetchSubmissionData]
+  )
+
+  const returnSubmission = useCallback(
+    async (
+      id: string,
+      data: {
+        feedback?: string | null
+      }
+    ) => {
+      const apiUrl = import.meta.env.VITE_API_BASE_URL
+      const response = await fetch(`${apiUrl}/submissions/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          status: "returned",
+          feedback: data.feedback || null,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to return submission")
       }
 
       await fetchSubmissionData()
@@ -144,5 +177,6 @@ export function useSubmissions(): SubmissionsData {
     error,
     refresh: fetchSubmissionData,
     gradeSubmission,
+    returnSubmission,
   }
 }
