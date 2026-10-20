@@ -20,10 +20,15 @@ interface GradeSubmissionDialogProps {
   onGrade: (
     id: string,
     data: {
-      grade?: string | null
+      grade: string
       feedback?: string | null
       teacherPdfUrl?: string | null
-      status?: "submitted" | "graded" | "returned"
+    }
+  ) => Promise<void>
+  onReturn: (
+    id: string,
+    data: {
+      feedback?: string | null
     }
   ) => Promise<void>
 }
@@ -31,6 +36,7 @@ interface GradeSubmissionDialogProps {
 export function GradeSubmissionDialog({
   submission,
   onGrade,
+  onReturn,
 }: GradeSubmissionDialogProps) {
   const [open, setOpen] = useState(false)
   const [grade, setGrade] = useState(submission.submission.grade || "")
@@ -47,15 +53,16 @@ export function GradeSubmissionDialog({
     setError(null)
 
     try {
-      // Only mark as graded if at least one grading field has a value
-      const hasGradingData = grade || feedback || teacherPdfUrl
-      const newStatus = hasGradingData ? "graded" : "submitted"
+      if (!grade.trim()) {
+        setError("Grade is required")
+        setLoading(false)
+        return
+      }
 
       await onGrade(submission.submission.id, {
-        grade: grade || null,
+        grade: grade.trim(),
         feedback: feedback || null,
         teacherPdfUrl: teacherPdfUrl || null,
-        status: newStatus, // ← Dynamic based on whether grading data exists
       })
       setOpen(false)
     } catch (err) {
@@ -185,11 +192,8 @@ export function GradeSubmissionDialog({
                 onClick={async () => {
                   setLoading(true)
                   try {
-                    await onGrade(submission.submission.id, {
-                      status: "returned",
-                      // If the teacher typed feedback before clicking return, save it!
-                      feedback:
-                        feedback || submission.submission.feedback || null,
+                    await onReturn(submission.submission.id, {
+                      feedback: feedback || null,
                     })
                     setOpen(false)
                   } catch (err) {

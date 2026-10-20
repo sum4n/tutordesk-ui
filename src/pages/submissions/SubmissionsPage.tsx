@@ -26,6 +26,7 @@ export function SubmissionsPage() {
     loading,
     error,
     gradeSubmission,
+    returnSubmission,
   } = useSubmissions()
 
   const { filters } = useFilter()
@@ -161,6 +162,7 @@ export function SubmissionsPage() {
                     <GradeSubmissionDialog
                       submission={s}
                       onGrade={gradeSubmission}
+                      onReturn={returnSubmission}
                     />
                   </TableCell>
                 </TableRow>
