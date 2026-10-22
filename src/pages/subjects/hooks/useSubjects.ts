@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react"
 import type { Subject } from "@/types"
+import { api } from "@/lib/api"
 
 interface SubjectsData {
   subjects: Subject[]
@@ -22,12 +23,7 @@ export function useSubjects(): SubjectsData {
   const fetchSubjects = useCallback(async () => {
     try {
       setLoading(true)
-      const apiUrl = import.meta.env.VITE_API_BASE_URL
-      const response = await fetch(`${apiUrl}/subjects`)
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch subjects")
-      }
+      const response = await api.get("/subjects")
 
       const data: Subject[] = await response.json()
       setSubjects(data)
@@ -41,16 +37,7 @@ export function useSubjects(): SubjectsData {
 
   const createSubject = useCallback(
     async (data: { name: string; description?: string }) => {
-      const apiUrl = import.meta.env.VITE_API_BASE_URL
-      const response = await fetch(`${apiUrl}/subjects`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      })
-
-      if (!response.ok) {
-        throw new Error("Failed to create subject")
-      }
+      await api.post("/subjects", data)
 
       await fetchSubjects()
     },
@@ -59,16 +46,7 @@ export function useSubjects(): SubjectsData {
 
   const updateSubject = useCallback(
     async (id: string, data: { name: string; description?: string }) => {
-      const apiUrl = import.meta.env.VITE_API_BASE_URL
-      const response = await fetch(`${apiUrl}/subjects/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      })
-
-      if (!response.ok) {
-        throw new Error("Failed to update subject")
-      }
+      await api.patch(`/subjects/${id}`, data)
 
       await fetchSubjects()
     },
@@ -77,15 +55,7 @@ export function useSubjects(): SubjectsData {
 
   const deleteSubject = useCallback(
     async (id: string) => {
-      const apiUrl = import.meta.env.VITE_API_BASE_URL
-      const response = await fetch(`${apiUrl}/subjects/${id}`, {
-        method: "DELETE",
-      })
-
-      if (!response.ok) {
-        throw new Error("Failed to delete subject")
-      }
-
+      await api.delete(`/subjects/${id}`)
       await fetchSubjects()
     },
     [fetchSubjects]

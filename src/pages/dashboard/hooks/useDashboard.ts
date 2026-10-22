@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import type { Student, Class, Assignment, Submission, Stat } from "@/types"
+import { api } from "@/lib/api"
 
 interface EnrichedSubmission {
   id: string
@@ -41,24 +42,13 @@ export function useDashboard(): DashboardData {
   useEffect(() => {
     async function fetchDashboardData() {
       try {
-        const apiUrl = import.meta.env.VITE_API_BASE_URL
-
         const [studentsRes, classesRes, assignmentsRes, submissionsRes] =
           await Promise.all([
-            fetch(`${apiUrl}/users?role=student`),
-            fetch(`${apiUrl}/classes`),
-            fetch(`${apiUrl}/assignments`),
-            fetch(`${apiUrl}/submissions`),
+            api.get("/users?role=student"),
+            api.get("/classes"),
+            api.get("/assignments"),
+            api.get("/submissions"),
           ])
-
-        if (
-          !studentsRes.ok ||
-          !classesRes.ok ||
-          !assignmentsRes.ok ||
-          !submissionsRes.ok
-        ) {
-          throw new Error("Failed to fetch dashboard data")
-        }
 
         const students: Student[] = await studentsRes.json()
         const classes: Class[] = await classesRes.json()

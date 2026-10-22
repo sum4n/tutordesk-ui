@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react"
 import type { Student, Class, Batch, Assignment, Submission } from "@/types"
+import { api } from "@/lib/api"
 
 interface StudentsData {
   students: Student[]
@@ -40,7 +41,6 @@ export function useStudents(): StudentsData {
   const fetchStudentData = useCallback(async () => {
     try {
       setLoading(true)
-      const apiUrl = import.meta.env.VITE_API_BASE_URL
       const [
         studentsRes,
         classesRes,
@@ -48,22 +48,12 @@ export function useStudents(): StudentsData {
         assignmentsRes,
         submissionsRes,
       ] = await Promise.all([
-        fetch(`${apiUrl}/users?role=student`),
-        fetch(`${apiUrl}/classes`),
-        fetch(`${apiUrl}/batches`),
-        fetch(`${apiUrl}/assignments`),
-        fetch(`${apiUrl}/submissions`),
+        api.get("/users?role=student"),
+        api.get("/classes"),
+        api.get("/batches"),
+        api.get("/assignments"),
+        api.get("/submissions"),
       ])
-
-      if (
-        !studentsRes.ok ||
-        !classesRes.ok ||
-        !batchesRes.ok ||
-        !assignmentsRes.ok ||
-        !submissionsRes.ok
-      ) {
-        throw new Error("Failed to fetch student data")
-      }
 
       const [
         studentsData,
@@ -99,8 +89,6 @@ export function useStudents(): StudentsData {
       classId: string
       batchId?: string | null
     }) => {
-      const apiUrl = import.meta.env.VITE_API_BASE_URL
-
       // Inject role and default password
       const payload = {
         ...data,
@@ -108,15 +96,7 @@ export function useStudents(): StudentsData {
         password: "student",
       }
 
-      const response = await fetch(`${apiUrl}/users`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      })
-
-      if (!response.ok) {
-        throw new Error("Failed to create student")
-      }
+      await api.post("/users", payload)
 
       await fetchStudentData()
     },
@@ -133,16 +113,7 @@ export function useStudents(): StudentsData {
         batchId?: string | null
       }
     ) => {
-      const apiUrl = import.meta.env.VITE_API_BASE_URL
-      const response = await fetch(`${apiUrl}/users/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      })
-
-      if (!response.ok) {
-        throw new Error("Failed to update student")
-      }
+      await api.patch(`/users/${id}`, data)
 
       await fetchStudentData()
     },
@@ -151,14 +122,7 @@ export function useStudents(): StudentsData {
 
   const deleteStudent = useCallback(
     async (id: string) => {
-      const apiUrl = import.meta.env.VITE_API_BASE_URL
-      const response = await fetch(`${apiUrl}/users/${id}`, {
-        method: "DELETE",
-      })
-
-      if (!response.ok) {
-        throw new Error("Failed to delete student")
-      }
+      await api.delete(`/users/${id}`)
 
       await fetchStudentData()
     },

@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react"
 import type { Batch } from "@/types"
+import { api } from "@/lib/api"
 
 interface BatchesData {
   batches: Batch[]
@@ -26,12 +27,7 @@ export function useBatches(classId: string): BatchesData {
   const fetchBatches = useCallback(async () => {
     try {
       setLoading(true)
-      const apiUrl = import.meta.env.VITE_API_BASE_URL
-      const response = await fetch(`${apiUrl}/batches?classId=${classId}`)
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch batches")
-      }
+      const response = await api.get(`/batches?classId=${classId}`)
 
       const data: Batch[] = await response.json()
       setBatches(data)
@@ -45,16 +41,7 @@ export function useBatches(classId: string): BatchesData {
 
   const createBatch = useCallback(
     async (data: { name: string; classId: string; schedule?: string }) => {
-      const apiUrl = import.meta.env.VITE_API_BASE_URL
-      const response = await fetch(`${apiUrl}/batches`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      })
-
-      if (!response.ok) {
-        throw new Error("Failed to create batch")
-      }
+      await api.post("/batches", data)
 
       await fetchBatches()
     },
@@ -63,16 +50,7 @@ export function useBatches(classId: string): BatchesData {
 
   const updateBatch = useCallback(
     async (id: string, data: { name: string; schedule?: string }) => {
-      const apiUrl = import.meta.env.VITE_API_BASE_URL
-      const response = await fetch(`${apiUrl}/batches/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      })
-
-      if (!response.ok) {
-        throw new Error("Failed to update batch")
-      }
+      await api.patch(`/batches/${id}`, data)
 
       await fetchBatches()
     },
@@ -81,15 +59,7 @@ export function useBatches(classId: string): BatchesData {
 
   const deleteBatch = useCallback(
     async (id: string) => {
-      const apiUrl = import.meta.env.VITE_API_BASE_URL
-      const response = await fetch(`${apiUrl}/batches/${id}`, {
-        method: "DELETE",
-      })
-
-      if (!response.ok) {
-        throw new Error("Failed to delete batch")
-      }
-
+      await api.delete(`/batches/${id}`)
       await fetchBatches()
     },
     [fetchBatches]

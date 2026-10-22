@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react"
 import { useAuth } from "@/context/useAuth"
 import type { Assignment, Submission } from "@/types"
+import { api } from "@/lib/api"
 
 export interface StudentAssignment extends Assignment {
   submission?: Submission
@@ -24,8 +25,6 @@ export function useStudentAssignments() {
 
     try {
       setLoading(true)
-      const apiUrl = import.meta.env.VITE_API_BASE_URL
-
       // Fetch all data
       const [
         assignmentsRes,
@@ -34,22 +33,12 @@ export function useStudentAssignments() {
         batchesRes,
         submissionsRes,
       ] = await Promise.all([
-        fetch(`${apiUrl}/assignments`),
-        fetch(`${apiUrl}/subjects`),
-        fetch(`${apiUrl}/classes`),
-        fetch(`${apiUrl}/batches`),
-        fetch(`${apiUrl}/submissions?studentId=${user.id}`),
+        api.get("/assignments"),
+        api.get("/subjects"),
+        api.get("/classes"),
+        api.get("/batches"),
+        api.get(`/submissions?studentId=${user.id}`),
       ])
-
-      if (
-        !assignmentsRes.ok ||
-        !subjectsRes.ok ||
-        !classesRes.ok ||
-        !batchesRes.ok ||
-        !submissionsRes.ok
-      ) {
-        throw new Error("Failed to fetch data")
-      }
 
       const [
         assignmentsData,
@@ -121,45 +110,32 @@ export function useStudentAssignments() {
       if (!user?.id || user.role !== "student") {
         throw new Error("Student ID not found")
       }
-
-      const apiUrl = import.meta.env.VITE_API_BASE_URL
-
       // 2. If submissionId exists, we are resubmitting an existing record (PATCH)
       if (submissionId) {
-        const response = await fetch(`${apiUrl}/submissions/${submissionId}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            status: "submitted",
-            studentPdfUrl,
-            submittedAt: new Date().toISOString().split("T")[0],
-            // Clear old grading data for the fresh attempt
-            grade: null,
-            feedback: null,
-            teacherPdfUrl: null,
-            gradedAt: null,
-          }),
+        await api.patch(`/submissions/${submissionId}`, {
+          status: "submitted",
+          studentPdfUrl,
+          submittedAt: new Date().toISOString().split("T")[0],
+          // Clear old grading data for the fresh attempt
+          grade: null,
+          feedback: null,
+          teacherPdfUrl: null,
+          gradedAt: null,
         })
-        if (!response.ok) throw new Error("Failed to resubmit assignment")
       }
       // 3. Otherwise, it's a brand new submission (POST)
       else {
-        const response = await fetch(`${apiUrl}/submissions`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            assignmentId,
-            studentId: user.id,
-            status: "submitted",
-            studentPdfUrl,
-            submittedAt: new Date().toISOString().split("T")[0],
-            teacherPdfUrl: null,
-            gradedAt: null,
-            grade: null,
-            feedback: null,
-          }),
+        await api.post("/submissions", {
+          assignmentId,
+          studentId: user.id,
+          status: "submitted",
+          studentPdfUrl,
+          submittedAt: new Date().toISOString().split("T")[0],
+          teacherPdfUrl: null,
+          gradedAt: null,
+          grade: null,
+          feedback: null,
         })
-        if (!response.ok) throw new Error("Failed to submit assignment")
       }
 
       await fetchAssignments()

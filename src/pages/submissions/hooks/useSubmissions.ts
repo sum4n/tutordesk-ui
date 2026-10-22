@@ -7,6 +7,7 @@ import type {
   Batch,
   Subject,
 } from "@/types"
+import { api } from "@/lib/api"
 
 interface SubmissionsData {
   submissions: Submission[]
@@ -47,7 +48,6 @@ export function useSubmissions(): SubmissionsData {
   const fetchSubmissionData = useCallback(async () => {
     try {
       setLoading(true)
-      const apiUrl = import.meta.env.VITE_API_BASE_URL
       const [
         submissionsRes,
         assignmentsRes,
@@ -56,24 +56,13 @@ export function useSubmissions(): SubmissionsData {
         batchesRes,
         subjectsRes,
       ] = await Promise.all([
-        fetch(`${apiUrl}/submissions`),
-        fetch(`${apiUrl}/assignments`),
-        fetch(`${apiUrl}/users?role=student`),
-        fetch(`${apiUrl}/classes`),
-        fetch(`${apiUrl}/batches`),
-        fetch(`${apiUrl}/subjects`),
+        api.get("/submissions"),
+        api.get("/assignments"),
+        api.get("/users?role=student"),
+        api.get("/classes"),
+        api.get("/batches"),
+        api.get("/subjects"),
       ])
-
-      if (
-        !submissionsRes.ok ||
-        !assignmentsRes.ok ||
-        !studentsRes.ok ||
-        !classesRes.ok ||
-        !batchesRes.ok ||
-        !subjectsRes.ok
-      ) {
-        throw new Error("Failed to fetch submission data")
-      }
 
       const [
         submissionsData,
@@ -114,22 +103,13 @@ export function useSubmissions(): SubmissionsData {
         teacherPdfUrl?: string | null
       }
     ) => {
-      const apiUrl = import.meta.env.VITE_API_BASE_URL
-      const response = await fetch(`${apiUrl}/submissions/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          status: "graded",
-          grade: data.grade,
-          feedback: data.feedback || null,
-          teacherPdfUrl: data.teacherPdfUrl || null,
-          gradedAt: new Date().toISOString().split("T")[0],
-        }),
+      await api.patch(`/submissions/${id}`, {
+        status: "graded",
+        grade: data.grade,
+        feedback: data.feedback || null,
+        teacherPdfUrl: data.teacherPdfUrl || null,
+        gradedAt: new Date().toISOString().split("T")[0],
       })
-
-      if (!response.ok) {
-        throw new Error("Failed to grade submission")
-      }
 
       await fetchSubmissionData()
     },
@@ -143,19 +123,10 @@ export function useSubmissions(): SubmissionsData {
         feedback?: string | null
       }
     ) => {
-      const apiUrl = import.meta.env.VITE_API_BASE_URL
-      const response = await fetch(`${apiUrl}/submissions/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          status: "returned",
-          feedback: data.feedback || null,
-        }),
+      await api.patch(`/submissions/${id}`, {
+        status: "returned",
+        feedback: data.feedback || null,
       })
-
-      if (!response.ok) {
-        throw new Error("Failed to return submission")
-      }
 
       await fetchSubmissionData()
     },
