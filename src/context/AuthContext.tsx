@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import type { ReactNode } from "react"
-import { AuthContext } from "./useAuth"
+import { AuthContext } from "@/context/useAuth"
+import { api } from "@/lib/api"
 
 interface User {
   id: string
@@ -34,14 +35,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, [])
 
   const login = async (email: string, password: string) => {
-    const apiUrl = import.meta.env.VITE_API_BASE_URL
-    const response = await fetch(
-      `${apiUrl}/users?email=${email}&password=${password}`
-    )
-
-    if (!response.ok) {
-      throw new Error("Login failed")
-    }
+    // TODO: rewrite this after proper back-end
+    const response = await api.get(`/users?email=${email}&password=${password}`)
 
     const users = await response.json()
 
@@ -71,25 +66,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
     classId?: string | null
     batchId?: string | null
   }) => {
-    const apiUrl = import.meta.env.VITE_API_BASE_URL
+    // // 1. Check if email already exists
+    const checkRes = await api.get(`/users?email=${data.email}`)
 
-    // 1. Check if email already exists
-    const checkRes = await fetch(`${apiUrl}/users?email=${data.email}`)
     const existingUsers = await checkRes.json()
     if (existingUsers.length > 0) {
       throw new Error("Email already registered")
     }
 
-    // 2. Create the user (which is also the student record)
-    const response = await fetch(`${apiUrl}/users`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    })
-
-    if (!response.ok) {
-      throw new Error("Signup failed")
-    }
+    const response = await api.post("/users", data)
 
     const newUser = await response.json()
     const token = `token_${newUser.id}_${Date.now()}`
