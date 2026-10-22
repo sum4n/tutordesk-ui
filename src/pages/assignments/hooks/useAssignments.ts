@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react"
 import type { Assignment, Class, Batch, Subject, Submission } from "@/types"
+import { api } from "@/lib/api"
 
 interface AssignmentsData {
   assignments: Assignment[]
@@ -37,7 +38,6 @@ export function useAssignments(): AssignmentsData {
   const fetchAssignmentData = useCallback(async () => {
     try {
       setLoading(true)
-      const apiUrl = import.meta.env.VITE_API_BASE_URL
       const [
         assignmentsRes,
         classesRes,
@@ -45,22 +45,12 @@ export function useAssignments(): AssignmentsData {
         subjectsRes,
         submissionsRes,
       ] = await Promise.all([
-        fetch(`${apiUrl}/assignments`),
-        fetch(`${apiUrl}/classes`),
-        fetch(`${apiUrl}/batches`),
-        fetch(`${apiUrl}/subjects`),
-        fetch(`${apiUrl}/submissions`),
+        api.get("/assignments"),
+        api.get("/classes"),
+        api.get("/batches"),
+        api.get("/subjects"),
+        api.get("/submissions"),
       ])
-
-      if (
-        !assignmentsRes.ok ||
-        !classesRes.ok ||
-        !batchesRes.ok ||
-        !subjectsRes.ok ||
-        !submissionsRes.ok
-      ) {
-        throw new Error("Failed to fetch assignment data")
-      }
 
       const [
         assignmentsData,
@@ -102,16 +92,7 @@ export function useAssignments(): AssignmentsData {
         dueDate?: string
       }
     ) => {
-      const apiUrl = import.meta.env.VITE_API_BASE_URL
-      const response = await fetch(`${apiUrl}/assignments/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      })
-
-      if (!response.ok) {
-        throw new Error("Failed to update assignment")
-      }
+      await api.patch(`/assignments/${id}`, data)
 
       await fetchAssignmentData()
     },
@@ -120,14 +101,7 @@ export function useAssignments(): AssignmentsData {
 
   const deleteAssignment = useCallback(
     async (id: string) => {
-      const apiUrl = import.meta.env.VITE_API_BASE_URL
-      const response = await fetch(`${apiUrl}/assignments/${id}`, {
-        method: "DELETE",
-      })
-
-      if (!response.ok) {
-        throw new Error("Failed to delete assignment")
-      }
+      await api.delete(`/assignments/${id}`)
 
       await fetchAssignmentData()
     },
