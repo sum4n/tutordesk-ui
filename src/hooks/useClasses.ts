@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react"
 import type { Class, Student, Assignment, Batch } from "@/types"
+import { api } from "@/lib/api"
 
 interface ClassDetails {
   class: Class
@@ -29,24 +30,13 @@ export function useClasses(): ClassesData {
   const fetchClassData = useCallback(async () => {
     try {
       setLoading(true)
-      const apiUrl = import.meta.env.VITE_API_BASE_URL
       const [classesRes, studentsRes, assignmentsRes, batchesRes] =
         await Promise.all([
-          fetch(`${apiUrl}/classes`),
-          fetch(`${apiUrl}/users?role=student`),
-          fetch(`${apiUrl}/assignments`),
-          fetch(`${apiUrl}/batches`),
-          fetch(`${apiUrl}/subjects`),
+          api.get("/classes"),
+          api.get("/users?role=student"),
+          api.get("/assignments"),
+          api.get("/batches"),
         ])
-
-      if (
-        !classesRes.ok ||
-        !studentsRes.ok ||
-        !assignmentsRes.ok ||
-        !batchesRes.ok
-      ) {
-        throw new Error("Failed to fetch data")
-      }
 
       const classesData: Class[] = await classesRes.json()
       const students: Student[] = await studentsRes.json()
@@ -79,16 +69,7 @@ export function useClasses(): ClassesData {
 
   const updateClass = useCallback(
     async (id: string, data: { name: string; description: string }) => {
-      const apiUrl = import.meta.env.VITE_API_BASE_URL
-      const response = await fetch(`${apiUrl}/classes/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      })
-
-      if (!response.ok) {
-        throw new Error("Failed to update class")
-      }
+      await api.patch(`/classes/${id}`, data)
 
       // Refresh data after update
       await fetchClassData()
@@ -98,14 +79,7 @@ export function useClasses(): ClassesData {
 
   const deleteClass = useCallback(
     async (id: string) => {
-      const apiUrl = import.meta.env.VITE_API_BASE_URL
-      const response = await fetch(`${apiUrl}/classes/${id}`, {
-        method: "DELETE",
-      })
-
-      if (!response.ok) {
-        throw new Error("Failed to delete class")
-      }
+      await api.delete(`/classes/${id}`)
 
       await fetchClassData()
     },
