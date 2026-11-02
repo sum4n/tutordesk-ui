@@ -7,7 +7,6 @@ interface User {
   role: "teacher" | "student"
   classId?: string | null
   batchId?: string | null
-  studentId?: string
 }
 
 interface AuthContextType {
@@ -19,7 +18,6 @@ interface AuthContextType {
     email: string
     password: string
     name: string
-    role: "teacher" | "student"
     classId?: string | null
     batchId?: string | null
   }) => Promise<User>

@@ -35,59 +35,43 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, [])
 
   const login = async (email: string, password: string) => {
-    // TODO: rewrite this after proper back-end
-    const response = await api.get(`/users?email=${email}&password=${password}`)
+    const response = await api.post("/auth/login", { email, password })
 
-    const users = await response.json()
-
-    if (users.length === 0) {
-      throw new Error("Invalid email or password")
+    const { token, user } = (await response.json()) as {
+      token: string
+      user: User
     }
 
-    const foundUser = users[0]
-    const token = `token_${foundUser.id}_${Date.now()}`
-
-    // Strip password before saving
-    const { password: _password, ...safeUser } = foundUser
-
-    setUser(safeUser)
+    setUser(user)
     setToken(token)
-    localStorage.setItem("user", JSON.stringify(safeUser))
+
+    localStorage.setItem("user", JSON.stringify(user))
     localStorage.setItem("token", token)
 
-    return safeUser
+    return user
   }
 
   const signup = async (data: {
     email: string
     password: string
     name: string
-    role: "teacher" | "student"
     classId?: string | null
     batchId?: string | null
   }) => {
-    // // 1. Check if email already exists
-    const checkRes = await api.get(`/users?email=${data.email}`)
+    const response = await api.post("/auth/register", data)
 
-    const existingUsers = await checkRes.json()
-    if (existingUsers.length > 0) {
-      throw new Error("Email already registered")
+    const { token, user } = (await response.json()) as {
+      token: string
+      user: User
     }
 
-    const response = await api.post("/users", data)
-
-    const newUser = await response.json()
-    const token = `token_${newUser.id}_${Date.now()}`
-
-    // Strip password before saving
-    const { password: _password, ...safeNewUser } = newUser
-
-    setUser(safeNewUser)
+    setUser(user)
     setToken(token)
-    localStorage.setItem("user", JSON.stringify(safeNewUser))
+
+    localStorage.setItem("user", JSON.stringify(user))
     localStorage.setItem("token", token)
 
-    return safeNewUser
+    return user
   }
 
   const logout = () => {

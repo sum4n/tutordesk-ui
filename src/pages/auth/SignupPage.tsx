@@ -57,10 +57,6 @@ export function SignupPage() {
 
   const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (!classId) {
-      setError("Please select a class")
-      return
-    }
 
     setLoading(true)
     setError(null)
@@ -70,7 +66,6 @@ export function SignupPage() {
         email,
         password,
         name,
-        role: "student",
         classId,
         batchId,
       })
@@ -132,7 +127,6 @@ export function SignupPage() {
                     setBatchId(null)
                   }
                 }}
-                required
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select class" />

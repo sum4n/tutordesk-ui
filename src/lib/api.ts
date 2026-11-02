@@ -15,8 +15,22 @@ export async function apiRequest(endpoint: string, options: RequestInit = {}) {
   })
 
   if (!response.ok) {
-    // TODO: Enhance this later to parse JSON error messages from real backend
-    throw new Error(`API Error: ${response.status}`)
+    // Read the server's JSON error body. The backend returns
+    // { error: "..." } for AppError and { error, details } for
+    // validation failures. Without this, every failure surfaces as
+    // "API Error: 401" and the login page cannot tell the user
+    // whether the password was wrong or the account does not exist.
+    const body: unknown = await response.json().catch(() => null)
+
+    const message =
+      body !== null &&
+      typeof body === "object" &&
+      "error" in body &&
+      typeof body.error === "string"
+        ? body.error
+        : `Request faild with status ${response.status}`
+
+    throw new Error(message)
   }
 
   return response
