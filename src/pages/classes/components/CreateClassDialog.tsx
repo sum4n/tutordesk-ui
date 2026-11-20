@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Plus } from "lucide-react"
+import { api } from "@/lib/api"
 
 interface CreateClassDialogProps {
   onClassCreated: () => void
@@ -31,16 +32,12 @@ export function CreateClassDialog({ onClassCreated }: CreateClassDialogProps) {
     setError(null)
 
     try {
-      const apiUrl = import.meta.env.VITE_API_BASE_URL
-      const response = await fetch(`${apiUrl}/classes`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, description }),
-      })
-
-      if (!response.ok) {
-        throw new Error("Failed to create class")
-      }
+      // api.post attaches the Bearer token. The previous raw fetch sent
+      // no Authorization header, so every create returned 401.
+      // It also parses the server's error body: a duplicate class name
+      // now surfaces as "A class with this name already exists"
+      // instead of the generic "Failed to create class".
+      await api.post("/classes", { name, description })
 
       // Reset form and close dialog on success
       setName("")
