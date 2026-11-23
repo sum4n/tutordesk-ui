@@ -14,6 +14,7 @@ interface StudentsData {
   createStudent: (data: {
     name: string
     email: string
+    password: string
     classId: string
     batchId?: string | null
   }) => Promise<void>
@@ -86,17 +87,15 @@ export function useStudents(): StudentsData {
     async (data: {
       name: string
       email: string
+      password: string
       classId: string
       batchId?: string | null
     }) => {
-      // Inject role and default password
-      const payload = {
-        ...data,
-        role: "student",
-        password: "student",
-      }
-
-      await api.post("/users", payload)
+      // No role in the payload. The backend creates STUDENT only and
+      // createUserSchema is a strict object — sending `role` is a 400.
+      // The password is teacher-chosen and must be at least 8 chars;
+      // both the form and the server enforce that
+      await api.post("/users", data)
 
       await fetchStudentData()
     },

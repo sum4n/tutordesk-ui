@@ -25,6 +25,7 @@ interface CreateStudentDialogProps {
   onCreate: (data: {
     name: string
     email: string
+    password: string
     classId: string
     batchId?: string | null
   }) => Promise<void>
@@ -40,6 +41,7 @@ export function CreateStudentDialog({
   const [open, setOpen] = useState(false)
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
   const [className, setClassName] = useState("")
   const [batchName, setBatchName] = useState("none")
   const [loading, setLoading] = useState(false)
@@ -66,11 +68,13 @@ export function CreateStudentDialog({
       await onCreate({
         name,
         email,
+        password,
         classId: selectedClass.id,
         batchId,
       })
       setName("")
       setEmail("")
+      setPassword("")
       setClassName("")
       setBatchName("none")
       setOpen(false)
@@ -118,6 +122,18 @@ export function CreateStudentDialog({
                 placeholder="e.g., aarav@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="At least 8 characters"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                minLength={8}
                 required
               />
             </div>

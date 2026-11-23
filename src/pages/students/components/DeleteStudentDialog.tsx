@@ -52,7 +52,7 @@ export function DeleteStudentDialog({
           <DialogTitle>Delete Student</DialogTitle>
           <DialogDescription>
             Are you sure you want to delete <strong>{studentName}</strong>? This
-            action cannot be undone.
+            also deletes all of their submissions. This action cannot be undone.
           </DialogDescription>
         </DialogHeader>
         {error && <p className="text-sm text-red-500">{error}</p>}
