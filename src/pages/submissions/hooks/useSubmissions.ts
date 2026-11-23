@@ -108,7 +108,6 @@ export function useSubmissions(): SubmissionsData {
         grade: data.grade,
         feedback: data.feedback || null,
         teacherPdfUrl: data.teacherPdfUrl || null,
-        gradedAt: new Date().toISOString().split("T")[0],
       })
 
       await fetchSubmissionData()
