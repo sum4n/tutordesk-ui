@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { useFilter } from "@/context/useFilter"
+import { api } from "@/lib/api"
 import {
   Dialog,
   DialogContent,
@@ -105,25 +106,25 @@ export function CreateAssignmentDialog({
           ? null
           : batches.find((b) => b.name === batchName)?.id || null
 
-      const apiUrl = import.meta.env.VITE_API_BASE_URL
-      const response = await fetch(`${apiUrl}/assignments`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title,
-          description,
-          pdfUrl,
-          classId: selectedClass.id,
-          batchId,
-          subjectId: selectedSubject.id,
-          dueDate,
-          createdAt: new Date().toISOString().split("T")[0],
-        }),
+      // api.post attaches the Bearer token — the previous raw fetch
+      // sent no Authorization header, so every create returned 401.
+      //
+      // createdAt is NOT sent. The backend's createAssignmentSchema is
+      // a strictObject and the DB owns the column via @default(now()).
+      // Sending it was a second 400 stacked on top of the 401.
+      //
+      // The error parser in apiRequest surfaces the server's message:
+      // "Batch does not belong to the given class" instead of the
+      // generic "Failed to create assignment".
+      await api.post("/assignments", {
+        title,
+        description,
+        pdfUrl,
+        classId: selectedClass.id,
+        batchId,
+        subjectId: selectedSubject.id,
+        dueDate,
       })
-
-      if (!response.ok) {
-        throw new Error("Failed to create assignment")
-      }
 
       // Reset form, close dialog, and refresh parent
       handleOpenChange(false)
