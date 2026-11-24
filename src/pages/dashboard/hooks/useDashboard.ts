@@ -57,7 +57,7 @@ export function useDashboard(): DashboardData {
 
         // 1. Calculate Stats
         const pendingReviews = submissions.filter(
-          (s) => s.status !== "graded"
+          (s) => s.status === "submitted"
         ).length
 
         const today = new Date()
