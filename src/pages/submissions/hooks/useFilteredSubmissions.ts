@@ -25,6 +25,29 @@ export interface EnrichedSubmission {
   batchName: string | null
 }
 
+// One row per (student, assignment) — the current attempt.
+//
+// A RETURNED submission followed by a resubmit creates a second row.
+// Both are real; both stay in the database. The teacher only needs to
+// act on the latest one, and rendering both flat makes one piece of
+// work look like two.
+//
+// Newest first, keep the first row seen per pair. When timestamps
+// collide, the later-inserted row wins because stable sort preserves
+// the API's desc order — the backend already returns newest first.
+function keepLatestAttemptPerPair(submissions: Submission[]): Submission[] {
+  const latestByPair = new Map<string, Submission>()
+  const newestFirst = [...submissions].sort(
+    (a, b) =>
+      new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime()
+  )
+  for (const sub of newestFirst) {
+    const key = `${sub.studentId}::${sub.assignmentId}`
+    if (!latestByPair.has(key)) latestByPair.set(key, sub)
+  }
+  return Array.from(latestByPair.values())
+}
+
 export function useFilteredSubmissions({
   submissions,
   assignments,
@@ -34,7 +57,7 @@ export function useFilteredSubmissions({
   filters,
 }: UseFilteredSubmissionsProps) {
   const filteredSubmissions = useMemo(() => {
-    let filtered = submissions
+    let filtered = keepLatestAttemptPerPair(submissions)
 
     // Filter by class (through student)
     if (filters.classId) {
