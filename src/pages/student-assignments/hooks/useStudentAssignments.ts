@@ -105,38 +105,35 @@ export function useStudentAssignments() {
     async (
       assignmentId: string,
       studentPdfUrl: string,
-      submissionId?: string
+      _submissionId?: string
     ) => {
       if (!user?.id || user.role !== "student") {
-        throw new Error("Student ID not found")
+        throw new Error("Only students can submit assignments")
       }
-      // 2. If submissionId exists, we are resubmitting an existing record (PATCH)
-      if (submissionId) {
-        await api.patch(`/submissions/${submissionId}`, {
-          status: "submitted",
-          studentPdfUrl,
-          submittedAt: new Date().toISOString().split("T")[0],
-          // Clear old grading data for the fresh attempt
-          grade: null,
-          feedback: null,
-          teacherPdfUrl: null,
-          gradedAt: null,
-        })
-      }
-      // 3. Otherwise, it's a brand new submission (POST)
-      else {
-        await api.post("/submissions", {
-          assignmentId,
-          studentId: user.id,
-          status: "submitted",
-          studentPdfUrl,
-          submittedAt: new Date().toISOString().split("T")[0],
-          teacherPdfUrl: null,
-          gradedAt: null,
-          grade: null,
-          feedback: null,
-        })
-      }
+
+      // Resubmission creates a NEW submission row, not a PATCH.
+      //
+      //   1. POST /submissions is the only write path for students.
+      //      PATCH /submissions/:id is teacher-only (requireRole),
+      //      so a student PATCH returns 403 today.
+      //   2. A new row keeps the RETURNED attempt in history — the
+      //      whole point of allowing multiple submissions per
+      //      (assignment, student) with no unique constraint.
+      //   3. createSubmissionSchema is a strictObject and accepts
+      //      exactly { assignmentId, studentPdfUrl }. status,
+      //      submittedAt, grade, feedback, teacherPdfUrl, gradedAt,
+      //      and studentId are all server-owned; sending any of them
+      //      is a 400.
+      //
+      // _submissionId is accepted for signature compatibility with
+      // SubmitAssignmentDialog but is intentionally ignored.
+      // TODO: remove the parameter, the dialog prop, and the
+      // submissionId={...} on StudentAssignmentPage in a
+      // test(refactor): cleanup commit.
+      await api.post("/submissions", {
+        assignmentId,
+        studentPdfUrl,
+      })
 
       await fetchAssignments()
     },
