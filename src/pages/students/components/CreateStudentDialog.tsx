@@ -143,8 +143,10 @@ export function CreateStudentDialog({
                 <Select
                   value={className}
                   onValueChange={(value) => {
-                    setClassName(value)
-                    setBatchName("none")
+                    if (value !== null) {
+                      setClassName(value)
+                      setBatchName("none")
+                    }
                   }}
                   required
                 >
@@ -164,7 +166,9 @@ export function CreateStudentDialog({
                 <Label>Batch (Optional)</Label>
                 <Select
                   value={batchName}
-                  onValueChange={setBatchName}
+                  onValueChange={(value) => {
+                    if (value !== null) setBatchName(value)
+                  }}
                   disabled={!className || filteredBatches.length === 0}
                 >
                   <SelectTrigger>

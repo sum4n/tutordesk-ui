@@ -156,7 +156,12 @@ export function StudentsPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-            <Select value={selectedClass} onValueChange={setSelectedClass}>
+            <Select
+              value={selectedClass}
+              onValueChange={(value) => {
+                if (value !== null) setSelectedClass(value)
+              }}
+            >
               <SelectTrigger className="w-40">
                 <SelectValue placeholder="Filter by class" />
               </SelectTrigger>

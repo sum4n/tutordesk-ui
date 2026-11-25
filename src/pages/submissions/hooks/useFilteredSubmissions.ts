@@ -39,7 +39,12 @@ function keepLatestAttemptPerPair(submissions: Submission[]): Submission[] {
   const latestByPair = new Map<string, Submission>()
   const newestFirst = [...submissions].sort(
     (a, b) =>
-      new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime()
+      // submittedAt is always set by the backend (@default(now()) and
+      // serializeSubmission). The `?? 0` is defensive: the frontend
+      // type still says `string | null` from the json-server era.
+      // A null sorts as epoch — oldest — which is the right fallback.
+      new Date(b.submittedAt ?? 0).getTime() -
+      new Date(a.submittedAt ?? 0).getTime()
   )
   for (const sub of newestFirst) {
     const key = `${sub.studentId}::${sub.assignmentId}`

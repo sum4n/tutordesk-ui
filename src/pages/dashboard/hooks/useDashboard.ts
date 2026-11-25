@@ -7,7 +7,7 @@ interface EnrichedSubmission {
   studentName: string
   assignmentTitle: string
   className: string
-  status: "pending" | "submitted" | "graded"
+  status: "pending" | "submitted" | "graded" | "returned"
   submittedAt: string | null
 }
 
