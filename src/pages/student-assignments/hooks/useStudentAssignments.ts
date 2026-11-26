@@ -100,36 +100,22 @@ export function useStudentAssignments() {
     }
   }, [user])
 
-  // 1. Update the signature to accept an optional submissionId
   const submitAssignment = useCallback(
-    async (
-      assignmentId: string,
-      studentPdfUrl: string,
-      _submissionId?: string
-    ) => {
+    async (assignmentId: string, studentPdfUrl: string) => {
       if (!user?.id || user.role !== "student") {
         throw new Error("Only students can submit assignments")
       }
 
       // Resubmission creates a NEW submission row, not a PATCH.
+      // POST /submissions is the only write path for students;
+      // PATCH /submissions/:id is teacher-only. A new row keeps the
+      // RETURNED attempt in history — the reason there is no
+      // @@unique([assignmentId, studentId]) on the schema.
       //
-      //   1. POST /submissions is the only write path for students.
-      //      PATCH /submissions/:id is teacher-only (requireRole),
-      //      so a student PATCH returns 403 today.
-      //   2. A new row keeps the RETURNED attempt in history — the
-      //      whole point of allowing multiple submissions per
-      //      (assignment, student) with no unique constraint.
-      //   3. createSubmissionSchema is a strictObject and accepts
-      //      exactly { assignmentId, studentPdfUrl }. status,
-      //      submittedAt, grade, feedback, teacherPdfUrl, gradedAt,
-      //      and studentId are all server-owned; sending any of them
-      //      is a 400.
-      //
-      // _submissionId is accepted for signature compatibility with
-      // SubmitAssignmentDialog but is intentionally ignored.
-      // TODO: remove the parameter, the dialog prop, and the
-      // submissionId={...} on StudentAssignmentPage in a
-      // test(refactor): cleanup commit.
+      // createSubmissionSchema is a strictObject accepting exactly
+      // { assignmentId, studentPdfUrl }. status, submittedAt, grade,
+      // feedback, teacherPdfUrl, gradedAt and studentId are all
+      // server-owned; sending any of them is a 400.
       await api.post("/submissions", {
         assignmentId,
         studentPdfUrl,

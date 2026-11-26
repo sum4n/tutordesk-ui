@@ -192,7 +192,6 @@ export function StudentAssignmentsPage() {
                         {(!status || status === "returned") && (
                           <SubmitAssignmentDialog
                             assignment={assignment}
-                            submissionId={assignment.submission?.id}
                             onSubmit={submitAssignment}
                             isResubmit={status === "returned"}
                           />

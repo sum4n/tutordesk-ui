@@ -16,18 +16,12 @@ import type { StudentAssignment } from "../hooks/useStudentAssignments"
 
 interface SubmitAssignmentDialogProps {
   assignment: StudentAssignment
-  submissionId?: string
-  onSubmit: (
-    assignmentId: string,
-    studentPdfUrl: string,
-    submissionId?: string
-  ) => Promise<void>
+  onSubmit: (assignmentId: string, studentPdfUrl: string) => Promise<void>
   isResubmit?: boolean
 }
 
 export function SubmitAssignmentDialog({
   assignment,
-  submissionId,
   onSubmit,
   isResubmit,
 }: SubmitAssignmentDialogProps) {
@@ -35,6 +29,12 @@ export function SubmitAssignmentDialog({
   const [pdfUrl, setPdfUrl] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // Both labels read isResubmit. The title and description already did;
+  // the trigger and the submit button did not, so a returned assignment
+  // showed "Submit" while the dialog header said "Resubmit".
+  const actionLabel = isResubmit ? "Resubmit" : "Submit"
+  const actionLabelLoading = isResubmit ? "Resubmitting..." : "Submitting..."
 
   const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -47,7 +47,7 @@ export function SubmitAssignmentDialog({
     setError(null)
 
     try {
-      await onSubmit(assignment.id, pdfUrl, submissionId)
+      await onSubmit(assignment.id, pdfUrl)
       setPdfUrl("")
       setOpen(false)
     } catch (err) {
@@ -63,7 +63,7 @@ export function SubmitAssignmentDialog({
         render={
           <Button size="sm" className="gap-1.5">
             <Upload className="h-3.5 w-3.5" />
-            Submit
+            {actionLabel}
           </Button>
         }
       />
@@ -107,7 +107,7 @@ export function SubmitAssignmentDialog({
               Cancel
             </Button>
             <Button type="submit" disabled={loading}>
-              {loading ? "Submitting..." : "Submit Assignment"}
+              {loading ? actionLabelLoading : `${actionLabel} Assignment`}
             </Button>
           </DialogFooter>
         </form>
